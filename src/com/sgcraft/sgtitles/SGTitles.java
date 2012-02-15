@@ -24,7 +24,6 @@ public class SGTitles extends JavaPlugin {
 		PluginDescriptionFile pdf = this.getDescription();
 		// Connect to SQLite DB
 		sql = new SQLite(logger, "SGTitles", "titles", getDataFolder().getPath());
-		sql.open();
 		
 		logger.info("[" + pdf.getName() + "] v" + pdf.getVersion() + " is now enabled!");
 	}
