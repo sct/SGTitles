@@ -13,7 +13,12 @@ public class Title {
 	public String position;
 	public final Logger logger = Logger.getLogger("Minecraft");
 	
+	public Title() {
+		super();
+	}
+	
 	public Title(String name, String data, String position) {
+		super();
 		if (!exists(name)) {
 			this.name = name;
 			this.data = data;
@@ -37,7 +42,37 @@ public class Title {
 			return false;
 	}
 	
-	public void load(String name) {
+	public static Title load(String name) {
+		Title title = new Title();
+		
+		title.loadTitleData(name);
+		
+		return title;
+	}
+	
+	public Integer getId() {
+		return this.id;
+	}
+	
+	public String getData() {
+		return this.data;
+	}
+	
+	public Boolean isPrefix() {
+		if (this.position == "prefix")
+			return true;
+		else
+			return false;
+	}
+	
+	public Boolean isSuffix() {
+		if (this.position == "suffix")
+			return true;
+		else
+			return false;
+	}
+	
+	public void loadTitleData(String name) {
 		ResultSet rs = SGTitles.sql.query("SELECT * FROM titles WHERE name='" + name + "'");
 		if (rs != null) {
 			try {
