@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sgcraft.sgtitles.commands.TitleCommands;
 import com.sgcraft.sgtitles.title.Title;
+import com.sgcraft.sgtitles.title.TitleManager;
 
 public class SGTitles extends JavaPlugin {
 	public static SGTitles plugin;
@@ -32,6 +33,7 @@ public class SGTitles extends JavaPlugin {
 		// Create tables if they dont exist
 		createTables();
 		addCommands();
+		TitleManager.loadAllTitles();
 		logger.info("[" + pdf.getName() + "] v" + pdf.getVersion() + " is now enabled!");
 	}
 	
@@ -45,5 +47,8 @@ public class SGTitles extends JavaPlugin {
 		
 		// Player/Title Association Table
 		sql.createTable("CREATE TABLE if not exists player_titles (id INTEGER PRIMARY KEY AUTOINCREMENT, player_name TEXT NOT NULL, title_name INTEGER NOT NULL)");
+		
+		// Active Title Database
+		sql.createTable("CREATE TABLE if not exists active_titles (player_name TEXT NOT NULL, title_prefix TEXT, title_suffix TEXT)");
 	}
 }

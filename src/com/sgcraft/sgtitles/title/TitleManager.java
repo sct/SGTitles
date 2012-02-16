@@ -2,16 +2,24 @@ package com.sgcraft.sgtitles.title;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.sgcraft.sgtitles.SGTitles;
 
 public class TitleManager {
 	
 	public static void loadAllTitles() {
+		List<String> tmpNames = new ArrayList<String>();
 		try {
 			ResultSet rs = SGTitles.sql.query("SELECT name FROM titles");
 			while (rs.next()) {
-				loadTitle(rs.getString("name"));
+				tmpNames.add(rs.getString("name"));
+			}
+			rs.close();
+			
+			for (String tmpName : tmpNames) {
+				loadTitle(tmpName);
 			}
 		} catch (SQLException e) {
 			// Do something

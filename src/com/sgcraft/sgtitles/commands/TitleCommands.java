@@ -83,7 +83,7 @@ public class TitleCommands implements CommandExecutor {
         
         if (titleCommand("devlist",args,sender) && (args.length == 1)) {
         	for (Title title : SGTitles.TitleList.values()) {
-        		sender.sendMessage("[DEBUG] Title: " + title.getName() + " Data: " + title.getData() + " Position: " + title.getPos());
+        		sender.sendMessage("[DEBUG] Title: " + title.getName() + " Data: " + title.getData() + " Position:" + title.getPos() + ":");
         	}
         	return true;
         }

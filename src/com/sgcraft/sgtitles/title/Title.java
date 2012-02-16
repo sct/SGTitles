@@ -14,36 +14,15 @@ public class Title {
 	
 	public Title(String name, String data, String position) {
 		if (!exists(name)) {
-			this.name = name;
+			this.name = name.toLowerCase();
 			this.data = data;
-			this.position = position;
+			this.position = position.toLowerCase();
 			SGTitles.sql.query("INSERT INTO titles (name,data,position) VALUES ('" + name + "','" + data + "','" + position + "')");
 		}
 	}
 	
 	public Title(String name) {
 		this.name = name;
-	}
-	
-	public Boolean exists(String name) {
-		try {
-			ResultSet rs = SGTitles.sql.query("SELECT count(id) AS counted FROM titles WHERE name='" + name + "'");
-			int counted = rs.getInt("counted");
-			rs.close();
-			if (counted > 0)
-				return true;
-		} catch (SQLException e) {
-			// Do stuff?
-		}
-		return false;
-	}
-	
-	public static Title load(String name) {
-		Title title = new Title(name);
-		
-		title.loadTitleData(name);
-		
-		return title;
 	}
 	
 	public String getName() {
@@ -59,17 +38,27 @@ public class Title {
 	}
 	
 	public Boolean isPrefix() {
-		if (this.position == "prefix")
+		if (this.position.equalsIgnoreCase("prefix"))
 			return true;
 		else
 			return false;
 	}
 	
 	public Boolean isSuffix() {
-		if (this.position == "suffix")
+		if (this.position.equalsIgnoreCase("suffix"))
 			return true;
 		else
 			return false;
+	}
+	
+	// Static Methods
+	
+	public static Title load(String name) {
+		Title title = new Title(name);
+		
+		title.loadTitleData(name);
+		
+		return title;
 	}
 	
 	public void loadTitleData(String name) {
@@ -84,6 +73,19 @@ public class Title {
 				logger.info(e.getMessage());
 			}
 		}
+	}
+	
+	public static Boolean exists(String name) {
+		try {
+			ResultSet rs = SGTitles.sql.query("SELECT count(id) AS counted FROM titles WHERE name='" + name + "'");
+			int counted = rs.getInt("counted");
+			rs.close();
+			if (counted > 0)
+				return true;
+		} catch (SQLException e) {
+			// Do stuff?
+		}
+		return false;
 	}
 
 }
