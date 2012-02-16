@@ -20,6 +20,15 @@ public class PlayerManager {
 			rs.close();
 			if (counted > 0)
 				return true;
+			
+			// Assign title by group!
+			for (String tName : SGTitles.config.getStringList("groups." + SGTitles.permission.getPrimaryGroup(player))) {
+				player.sendMessage("[DEBUG!] " + tName + ":" + title.getName());
+				if (tName.equalsIgnoreCase(title.getName())) {
+					player.sendMessage("[DEBUG!] if success!");
+					return true;
+				}
+			}
 		} catch (SQLException e) {
 			// Do error stuff
 		}
