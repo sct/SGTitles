@@ -14,11 +14,9 @@ public class Title {
 	public final Logger logger = Logger.getLogger("Minecraft");
 	
 	public Title() {
-		super();
 	}
 	
 	public Title(String name, String data, String position) {
-		super();
 		if (!exists(name)) {
 			this.name = name;
 			this.data = data;

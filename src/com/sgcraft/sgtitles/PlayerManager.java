@@ -17,7 +17,7 @@ public class PlayerManager {
 		return false;
 	}
 	
-	public static void applyTitle(Player player, String name) {
+	public static Boolean applyTitle(Player player, String name) {
 		Title title = TitleManager.get(name);
 		String displayname;
 		if (title != null && checkTitle(player,title)) {
@@ -27,6 +27,19 @@ public class PlayerManager {
 				displayname = player.getName() + title.getData();
 			}
 			player.setDisplayName(displayname);
+			return true;
 		}
+		return false;
+	}
+	
+	public static Boolean giveTitle(Player player, String name) {
+		Title title = TitleManager.get(name);
+		String pName = player.getName();
+		if (!pName.isEmpty() && title != null && !checkTitle(player,title)) {
+			SGTitles.sql.query("INSERT INTO player_titles (player_name,title_id) VALUES ('" + pName + "','" + title.getId() + "'");
+			return true;
+		}
+		
+		return false;
 	}
 }

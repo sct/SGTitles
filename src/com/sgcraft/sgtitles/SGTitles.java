@@ -8,6 +8,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.sgcraft.sgtitles.commands.TitleCommands;
 import com.sgcraft.sgtitles.title.Title;
 
 public class SGTitles extends JavaPlugin {
@@ -28,7 +29,21 @@ public class SGTitles extends JavaPlugin {
 		PluginDescriptionFile pdf = this.getDescription();
 		// Connect to SQLite DB
 		sql = new SQLite(logger, "SGTitles", "titles", getDataFolder().getPath());
-		
+		// Create tables if they dont exist
+		createTables();
+		addCommands();
 		logger.info("[" + pdf.getName() + "] v" + pdf.getVersion() + " is now enabled!");
+	}
+	
+	private void addCommands() {
+		getCommand("title").setExecutor(new TitleCommands(this));
+	}
+	
+	private void createTables() {
+		// Create Titles Table
+		sql.createTable("CREATE TABLE if not exists titles (id INTEGER PRIMARY KEY, title TEXT NOT NULL, data TEXT NOT NULL, position TEXT NOT NULL);");
+		
+		// Player/Title Association Table
+		sql.createTable("CREATE TABLE if not exists player_titles (id INTEGER PRIMARY KEY, player_name TEXT NOT NULL, title_id INTEGER NOT NULL)");
 	}
 }
