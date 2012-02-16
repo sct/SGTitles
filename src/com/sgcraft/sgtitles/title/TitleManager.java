@@ -45,5 +45,9 @@ public class TitleManager {
 			SGTitles.TitleList.put(name, newtitle);
 		}
 	}
+	
+	public static String replaceColors(String s) {
+		return s.replaceAll("(?i)&([a-f0-9])", "\u00A7$1");
+	}
 
 }

@@ -2,7 +2,9 @@ package com.sgcraft.sgtitles;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.entity.Player;
 
@@ -12,6 +14,25 @@ import com.sgcraft.sgtitles.title.TitleManager;
 public class PlayerManager {
 	public static HashMap<String, Title> Suffix = new HashMap<String, Title>();
 	public static HashMap<String, Title> Prefix = new HashMap<String, Title>();
+	
+	public static List<Title> getTitles(Player player) {
+		List<Title> titles = new ArrayList<Title>();
+		
+		try {
+			ResultSet rs = SGTitles.sql.query("SELECT * FROM player_titles WHERE player_name='" + player.getName() + "'");
+			/*int count = rs.getInt("counted");
+			if (count == 0)
+				return null;*/
+			while (rs.next()) {
+				titles.add(TitleManager.get(rs.getString("title_name")));
+			}
+			rs.close();
+		} catch (SQLException e) {
+			// Catch error here!
+		}
+		
+		return titles;
+	}
 	
 	public static Boolean checkTitle(Player player, Title title) {
 		try {
@@ -23,9 +44,7 @@ public class PlayerManager {
 			
 			// Assign title by group!
 			for (String tName : SGTitles.config.getStringList("groups." + SGTitles.permission.getPrimaryGroup(player))) {
-				player.sendMessage("[DEBUG!] " + tName + ":" + title.getName());
 				if (tName.equalsIgnoreCase(title.getName())) {
-					player.sendMessage("[DEBUG!] if success!");
 					return true;
 				}
 			}
@@ -62,7 +81,7 @@ public class PlayerManager {
 			newName = newName + sTitle.getData();
 		}
 		
-		return newName;
+		return TitleManager.replaceColors(newName);
 	}
 	
 	public static Boolean giveTitle(Player player, String name) {
@@ -70,6 +89,22 @@ public class PlayerManager {
 		String pName = player.getName();
 		if (!pName.isEmpty() && title != null && !checkTitle(player,title)) {
 			SGTitles.sql.query("INSERT INTO player_titles (player_name,title_name) VALUES ('" + pName + "','" + title.getName() + "')");
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public static Boolean revokeTitle(Player player, String name) {
+		Title title = TitleManager.get(name);
+		String pName = player.getName();
+		if (!pName.isEmpty() && title != null) {
+			SGTitles.sql.query("DELETE FROM player_titles WHERE player_name='" + pName + "' AND title_name='" + title.getName() + "'");
+			if (title.isPrefix() && Prefix.get(pName).getName() == title.getName())
+				Prefix.remove(pName);
+			else if (title.isSuffix() && Suffix.get(pName).getName() == title.getName())
+				Suffix.remove(pName);
+			refreshTitle(player);
 			return true;
 		}
 		

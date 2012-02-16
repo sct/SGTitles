@@ -1,5 +1,7 @@
 package com.sgcraft.sgtitles.commands;
 
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -81,9 +83,58 @@ public class TitleCommands implements CommandExecutor {
         	
         }
         
-        if (titleCommand("devlist",args,sender) && (args.length == 1)) {
+        if (titleCommand("revoke",args,sender) && (args.length > 2)) {
+        	
+        	Player target = Bukkit.getServer().getPlayer(args[1]);
+        	if (target == null) {
+        		sender.sendMessage("[SGTitles] This player does not exist or is offline!");
+        		return true;
+        	}
+        	
+        	if (PlayerManager.revokeTitle(target,args[2])) {
+        		sender.sendMessage("[SGTitles] Title revoked from " + args[1]);
+        		return true;
+        	}
+        	
+        	return false;
+        }
+        
+        if (titleCommand("list",args,sender) && (args.length >= 1)) {
+        	Player target;
+        	Boolean self = true;
+        	int total = 0;
+        	if (args.length > 1) {
+        		target = Bukkit.getServer().getPlayer(args[1]);
+        		self = false;
+        	} else {
+        		target = Bukkit.getServer().getPlayer(sender.getName());
+        	}
+        	
+        	if (target == null) {
+        		sender.sendMessage("[SGTitles] This player does not exist or is offline!");
+        		return true;
+        	}
+        	
+        	List<Title> titles = PlayerManager.getTitles(target);
+        	if (self == true)
+        		sender.sendMessage("+ Your Titles");
+        	else
+        		sender.sendMessage("+ " + target.getName() + "'s Titles");
+        	
+        	sender.sendMessage("---------------------------------------");
+        	for (Title title : titles) {
+        		sender.sendMessage("| Name: " + title.getName() + " Type: " + title.getPos().toUpperCase() + " Title: " + TitleManager.replaceColors(title.getData()));
+        		total++;
+        	}
+        	if (total == 0)
+        		sender.sendMessage("No titles");
+        	sender.sendMessage("---------------------------------------");
+        	return true;
+        }
+        
+        if (titleCommand("fulllist",args,sender) && (args.length == 1)) {
         	for (Title title : SGTitles.TitleList.values()) {
-        		sender.sendMessage("[DEBUG] Title: " + title.getName() + " Data: " + title.getData() + " Position:" + title.getPos() + ":");
+        		sender.sendMessage("[DEBUG] Title: " + title.getName() + " Data: " + TitleManager.replaceColors(title.getData()) + " Position:" + title.getPos() + ":");
         	}
         	return true;
         }
