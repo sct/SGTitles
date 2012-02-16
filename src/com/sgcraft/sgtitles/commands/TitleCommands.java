@@ -52,7 +52,6 @@ public class TitleCommands implements CommandExecutor {
         	}
         	
         	return true;
-        	
         }
         
         if (titleCommand("set",args,sender) && (args.length > 1)) {
@@ -83,6 +82,18 @@ public class TitleCommands implements CommandExecutor {
         	
         }
         
+        if (titleCommand("delete",args,sender) && (args.length > 1)) {
+        	Title title = TitleManager.get(args[1]);
+        	if (title != null) {
+        		TitleManager.removeTitle(title);
+        		sender.sendMessage("[SGCraft] Title removed!");
+        	} else {
+        		sender.sendMessage("[SGCraft] Unknown title!");
+        	}
+        	
+        	return true;
+        }
+        
         if (titleCommand("revoke",args,sender) && (args.length > 2)) {
         	
         	Player target = Bukkit.getServer().getPlayer(args[1]);
@@ -97,6 +108,41 @@ public class TitleCommands implements CommandExecutor {
         	}
         	
         	return false;
+        }
+        
+        if (titleCommand("clear",args,sender) && (args.length >= 2)) {
+        	Player target;
+        	Boolean self = true;
+        	if (args.length > 2) {
+        		target = Bukkit.getServer().getPlayer(args[2]);
+        		self = false;
+        	} else {
+        		target = Bukkit.getServer().getPlayer(sender.getName());
+        	}
+        	
+        	if (target == null) {
+        		sender.sendMessage("[SGTitles] This player does not exist or is offline!");
+        		return true;
+        	}
+        	
+        	if (args[1].equalsIgnoreCase("prefix")) {
+        		PlayerManager.clearActive(target, "prefix");
+        	} else if (args[1].equalsIgnoreCase("suffix")) {
+        		PlayerManager.clearActive(target, "suffix");
+        	} else {
+        		sender.sendMessage("[SGTitles] You need to enter either prefix or suffix!");
+        		return true;
+        	}
+        	
+        	PlayerManager.refreshTitle(target);
+        	
+        	if (self == true)
+        		sender.sendMessage("[SGTitles] Your " + args[1].toUpperCase() + " has been cleared!");
+        	else {
+        		sender.sendMessage("[SGTitles] You have cleared " + target.getName() + "'s " + args[1].toUpperCase());
+        		target.sendMessage("[SGTitles] Your " + args[1].toUpperCase() + " has been cleared!");
+        	}
+        	return true;
         }
         
         if (titleCommand("list",args,sender) && (args.length >= 1)) {

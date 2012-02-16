@@ -27,6 +27,9 @@ public class PlayerManager {
 				titles.add(TitleManager.get(rs.getString("title_name")));
 			}
 			rs.close();
+			for (String tName : SGTitles.config.getStringList("groups." + SGTitles.permission.getPrimaryGroup(player))) {
+				titles.add(TitleManager.get(tName));
+			}
 		} catch (SQLException e) {
 			// Catch error here!
 		}
@@ -101,14 +104,25 @@ public class PlayerManager {
 		if (!pName.isEmpty() && title != null) {
 			SGTitles.sql.query("DELETE FROM player_titles WHERE player_name='" + pName + "' AND title_name='" + title.getName() + "'");
 			if (title.isPrefix() && Prefix.get(pName).getName() == title.getName())
-				Prefix.remove(pName);
+				clearActive(player,"prefix");
 			else if (title.isSuffix() && Suffix.get(pName).getName() == title.getName())
-				Suffix.remove(pName);
+				clearActive(player,"suffix");
 			refreshTitle(player);
 			return true;
 		}
 		
 		return false;
+	}
+	
+	public static void clearActive(Player player, String position) {
+		String pName = player.getName();
+		if (position.equalsIgnoreCase("prefix")) {
+			SGTitles.sql.query("UPDATE active_titles SET title_prefix=NULL WHERE player_name='" + player.getName() + "'");
+			Prefix.remove(pName);
+		} else {
+			SGTitles.sql.query("UPDATE active_titles SET title_suffix=NULL WHERE player_name='" + player.getName() + "'");
+			Suffix.remove(pName);
+		}
 	}
 	
 	public static void setActive(Player player, Title title) {

@@ -46,8 +46,16 @@ public class TitleManager {
 		}
 	}
 	
-	public static String replaceColors(String s) {
-		return s.replaceAll("(?i)&([a-f0-9])", "\u00A7$1");
+	public static void removeTitle(Title title) {
+		SGTitles.TitleList.remove(title.getName());
+		SGTitles.sql.query("DELETE FROM titles WHERE name='" + title.getName() + "';");
+		SGTitles.sql.query("DELETE FROM player_titles WHERE title_name='" + title.getName() + "';");
+		SGTitles.sql.query("UPDATE active_titles SET title_prefix=NULL WHERE title_prefix='" + title.getName() + "';");
+		SGTitles.sql.query("UPDATE active_titles SET title_suffix=NULL WHERE title_suffix='" + title.getName() + "';");
+	}
+	
+	public static String replaceColors(String replace) {
+		return replace.replaceAll("(?i)&([a-f0-9])", "\u00A7$1");
 	}
 
 }
