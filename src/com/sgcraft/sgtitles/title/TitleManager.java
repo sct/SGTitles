@@ -33,7 +33,9 @@ public class TitleManager {
 	
 	public static void addTitle(String name, String data, String position) {
 		Title newtitle = new Title(name,data,position);
-		SGTitles.TitleList.put(name, newtitle);
+		if (newtitle.getName() != null) {
+			SGTitles.TitleList.put(name, newtitle);
+		}
 	}
 
 }

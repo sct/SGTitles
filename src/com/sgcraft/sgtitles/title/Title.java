@@ -7,53 +7,55 @@ import java.util.logging.Logger;
 import com.sgcraft.sgtitles.SGTitles;
 
 public class Title {
-	public Integer id;
 	public String name;
 	public String data;
 	public String position;
 	public final Logger logger = Logger.getLogger("Minecraft");
-	
-	public Title() {
-	}
 	
 	public Title(String name, String data, String position) {
 		if (!exists(name)) {
 			this.name = name;
 			this.data = data;
 			this.position = position;
-			SGTitles.sql.query("INSERT INTO titles (name,data,position) VALUES ('" + name + "','" + data + "','" + position +"'");
-			ResultSet rs = SGTitles.sql.query("SELECT last_insert_rowid()");
-			try {
-				rs.first();
-				this.id = rs.getInt(0);
-			} catch (SQLException e) {
-				logger.info(e.getMessage());
-			}
+			SGTitles.sql.query("INSERT INTO titles (name,data,position) VALUES ('" + name + "','" + data + "','" + position + "')");
 		}
 	}
 	
+	public Title(String name) {
+		this.name = name;
+	}
+	
 	public Boolean exists(String name) {
-		ResultSet rs = SGTitles.sql.query("SELECT id FROM titles WHERE name='" + name + "'");
-		if (rs != null)
-			return true;
-		else
-			return false;
+		try {
+			ResultSet rs = SGTitles.sql.query("SELECT count(id) AS counted FROM titles WHERE name='" + name + "'");
+			int counted = rs.getInt("counted");
+			rs.close();
+			if (counted > 0)
+				return true;
+		} catch (SQLException e) {
+			// Do stuff?
+		}
+		return false;
 	}
 	
 	public static Title load(String name) {
-		Title title = new Title();
+		Title title = new Title(name);
 		
 		title.loadTitleData(name);
 		
 		return title;
 	}
 	
-	public Integer getId() {
-		return this.id;
+	public String getName() {
+		return this.name;
 	}
 	
 	public String getData() {
 		return this.data;
+	}
+	
+	public String getPos() {
+		return this.position;
 	}
 	
 	public Boolean isPrefix() {
@@ -71,11 +73,9 @@ public class Title {
 	}
 	
 	public void loadTitleData(String name) {
-		ResultSet rs = SGTitles.sql.query("SELECT * FROM titles WHERE name='" + name + "'");
+		ResultSet rs = SGTitles.sql.query("SELECT * FROM titles WHERE name='" + name + "' LIMIT 1");
 		if (rs != null) {
 			try {
-				rs.first();
-				this.id = rs.getInt("id");
 				this.name = rs.getString("name");
 				this.data = rs.getString("data");
 				this.position = rs.getString("position");

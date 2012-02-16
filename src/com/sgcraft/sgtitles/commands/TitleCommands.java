@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import com.sgcraft.sgtitles.PlayerManager;
 import com.sgcraft.sgtitles.SGTitles;
+import com.sgcraft.sgtitles.title.Title;
 import com.sgcraft.sgtitles.title.TitleManager;
 
 public class TitleCommands implements CommandExecutor {
@@ -78,6 +79,13 @@ public class TitleCommands implements CommandExecutor {
         	}
         	return true;
         	
+        }
+        
+        if (titleCommand("devlist",args,sender) && (args.length == 1)) {
+        	for (Title title : SGTitles.TitleList.values()) {
+        		sender.sendMessage("[DEBUG] Title: " + title.getName() + " Data: " + title.getData() + " Position: " + title.getPos());
+        	}
+        	return true;
         }
         
         return false;

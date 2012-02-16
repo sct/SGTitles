@@ -1,6 +1,7 @@
 package com.sgcraft.sgtitles;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.bukkit.entity.Player;
 
@@ -10,9 +11,14 @@ import com.sgcraft.sgtitles.title.TitleManager;
 public class PlayerManager {
 	
 	public static Boolean checkTitle(Player player, Title title) {
-		ResultSet rs = SGTitles.sql.query("SELECT * FROM `player_titles` WHERE player_name='" + player.getName() + "' AND title_id='" + title.getId() + "'");
-		if (rs != null) {
-			return true;
+		try {
+			ResultSet rs = SGTitles.sql.query("SELECT count(id) AS counted FROM player_titles WHERE player_name='" + player.getName() + "' AND title_name='" + title.getName() + "'");
+			int counted = rs.getInt("counted");
+			rs.close();
+			if (counted > 0)
+				return true;
+		} catch (SQLException e) {
+			// Do error stuff
 		}
 		return false;
 	}
@@ -24,7 +30,7 @@ public class PlayerManager {
 			if (title.isPrefix()) {
 				displayname = title.getData() + player.getName();
 			} else {
-				displayname = player.getName() + title.getData();
+				displayname = title.getData() + player.getName();
 			}
 			player.setDisplayName(displayname);
 			return true;
@@ -36,7 +42,7 @@ public class PlayerManager {
 		Title title = TitleManager.get(name);
 		String pName = player.getName();
 		if (!pName.isEmpty() && title != null && !checkTitle(player,title)) {
-			SGTitles.sql.query("INSERT INTO player_titles (player_name,title_id) VALUES ('" + pName + "','" + title.getId() + "'");
+			SGTitles.sql.query("INSERT INTO player_titles (player_name,title_name) VALUES ('" + pName + "','" + title.getName() + "')");
 			return true;
 		}
 		

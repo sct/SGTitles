@@ -28,7 +28,7 @@ public class SGTitles extends JavaPlugin {
 	public void onEnable() {
 		PluginDescriptionFile pdf = this.getDescription();
 		// Connect to SQLite DB
-		sql = new SQLite(logger, "SGTitles", "titles", getDataFolder().getPath());
+		sql = new SQLite(logger, "[SGTitles]", "titles", getDataFolder().getPath());
 		// Create tables if they dont exist
 		createTables();
 		addCommands();
@@ -41,9 +41,9 @@ public class SGTitles extends JavaPlugin {
 	
 	private void createTables() {
 		// Create Titles Table
-		sql.createTable("CREATE TABLE if not exists titles (id INTEGER PRIMARY KEY, name TEXT NOT NULL, data TEXT NOT NULL, position TEXT NOT NULL);");
+		sql.createTable("CREATE TABLE if not exists titles (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, data TEXT NOT NULL, position TEXT NOT NULL);");
 		
 		// Player/Title Association Table
-		sql.createTable("CREATE TABLE if not exists player_titles (id INTEGER PRIMARY KEY, player_name TEXT NOT NULL, title_id INTEGER NOT NULL)");
+		sql.createTable("CREATE TABLE if not exists player_titles (id INTEGER PRIMARY KEY AUTOINCREMENT, player_name TEXT NOT NULL, title_name INTEGER NOT NULL)");
 	}
 }
