@@ -36,6 +36,10 @@ public class PlayerManager {
 		return false;
 	}
 	
+	public static void refreshTitle(Player player) {
+		player.setDisplayName(formatTitle(player));
+	}
+	
 	public static String formatTitle(Player player) {
 		String oldName = player.getName();
 		String newName = player.getName();
@@ -77,9 +81,32 @@ public class PlayerManager {
 		
 	}
 	
+	public static void loadRecord(Player player) {
+		try {
+			ResultSet rs = SGTitles.sql.query("SELECT count(player_name) AS counted,title_prefix,title_suffix FROM active_titles WHERE player_name='" + player.getName() + "'");
+			int count = rs.getInt("counted");
+			String pName = rs.getString("title_prefix");
+			String sName = rs.getString("title_suffix");
+			player.sendMessage("[DEBUG] sname = " + sName);
+			if (count > 0) {
+				if (pName != null) {
+					Prefix.put(player.getName(), SGTitles.TitleList.get(pName));
+				}
+				
+				if (sName != null) {
+					Suffix.put(player.getName(), SGTitles.TitleList.get(sName));
+				}
+				refreshTitle(player);
+			}
+			rs.close();
+		} catch (SQLException e) {
+			// Do exception stuff
+		}
+	}
+	
 	public static void createRecord(Player player) {
 		try {
-			ResultSet rs = SGTitles.sql.query("SELECT count(player_name) AS counted FROM active_titles");
+			ResultSet rs = SGTitles.sql.query("SELECT count(player_name) AS counted FROM active_titles WHERE player_name='" + player.getName() + "'");
 			int count = rs.getInt("counted");
 			rs.close();
 			if (count == 0) {

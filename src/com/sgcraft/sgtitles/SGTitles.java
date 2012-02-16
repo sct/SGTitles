@@ -33,12 +33,17 @@ public class SGTitles extends JavaPlugin {
 		// Create tables if they dont exist
 		createTables();
 		addCommands();
+		startListeners();
 		TitleManager.loadAllTitles();
 		logger.info("[" + pdf.getName() + "] v" + pdf.getVersion() + " is now enabled!");
 	}
 	
 	private void addCommands() {
 		getCommand("title").setExecutor(new TitleCommands(this));
+	}
+	
+	public void startListeners() {
+		getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 	}
 	
 	private void createTables() {
