@@ -12,15 +12,14 @@ import com.sgcraft.sgtitles.SGTitles;
 import com.sgcraft.sgtitles.title.TitleManager;
 
 public class TitleCommands implements CommandExecutor {
-	SGTitles plugin;
+	public static SGTitles plugin;
 	
-	public TitleCommands(SGTitles instance) {
+	public TitleCommands (SGTitles instance) {
 		plugin = instance;
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label,
-			String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
 		if (sender instanceof ColouredConsoleSender)
         {

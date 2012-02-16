@@ -41,7 +41,7 @@ public class SGTitles extends JavaPlugin {
 	
 	private void createTables() {
 		// Create Titles Table
-		sql.createTable("CREATE TABLE if not exists titles (id INTEGER PRIMARY KEY, title TEXT NOT NULL, data TEXT NOT NULL, position TEXT NOT NULL);");
+		sql.createTable("CREATE TABLE if not exists titles (id INTEGER PRIMARY KEY, name TEXT NOT NULL, data TEXT NOT NULL, position TEXT NOT NULL);");
 		
 		// Player/Title Association Table
 		sql.createTable("CREATE TABLE if not exists player_titles (id INTEGER PRIMARY KEY, player_name TEXT NOT NULL, title_id INTEGER NOT NULL)");
