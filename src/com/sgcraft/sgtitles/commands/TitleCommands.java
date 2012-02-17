@@ -15,6 +15,7 @@ import com.sgcraft.sgtitles.PlayerManager;
 import com.sgcraft.sgtitles.SGTitles;
 import com.sgcraft.sgtitles.title.Title;
 import com.sgcraft.sgtitles.title.TitleManager;
+import com.sgcraft.sgtitles.utils.Backup;
 
 public class TitleCommands implements CommandExecutor {
 	public static SGTitles plugin;
@@ -45,7 +46,7 @@ public class TitleCommands implements CommandExecutor {
         	return true;
         }
         
-        if (titleCommand("add",args,sender)) {
+        if (titleCommand("add",args,sender,"admin.add")) {
         	cmdName = "Add";
         	cmdDesc = "Adds a title to a player";
         	cmdUsage = "/title add <user> <title>";
@@ -60,7 +61,7 @@ public class TitleCommands implements CommandExecutor {
         	}
         	
         	if (PlayerManager.giveTitle(target, args[2])) {
-        		sendMsg((Player) sender,target.getName() + " now has been given the title: " + args[2]);
+        		sendMsg((Player) sender,target.getName() + " has been granted the title: " + args[2]);
         		sendMsg(target,"You have been granted the title: " + args[2]);
         	} else {
         		sendErr((Player) sender,"That title does not exist or that player already has it!");
@@ -80,7 +81,7 @@ public class TitleCommands implements CommandExecutor {
         	
         	Player player = Bukkit.getServer().getPlayer(sender.getName());
         	if (PlayerManager.applyTitle(player, args[1])) {
-        		sendMsg((Player) sender,"Title as been applied!");
+        		sendMsg((Player) sender,"Title has been applied!");
         	} else {
         		sendErr((Player) sender,"Title does not exist or you do not own it");
         	}
@@ -88,7 +89,7 @@ public class TitleCommands implements CommandExecutor {
         	return true;
         }
         
-        if (titleCommand("create",args,sender)) {
+        if (titleCommand("create",args,sender,"admin.create")) {
         	cmdName = "Create";
         	cmdDesc = "Creates a new title";
         	cmdUsage = "/title create <name> <data> <prefix/suffix>";
@@ -112,7 +113,7 @@ public class TitleCommands implements CommandExecutor {
         	
         }
         
-        if (titleCommand("delete",args,sender)) {
+        if (titleCommand("delete",args,sender,"admin.delete")) {
         	cmdName = "Delete";
         	cmdDesc = "Deletes a title completely";
         	cmdUsage = "/title delete <name>";
@@ -132,7 +133,7 @@ public class TitleCommands implements CommandExecutor {
         	return true;
         }
         
-        if (titleCommand("revoke",args,sender)) {
+        if (titleCommand("revoke",args,sender,"admin.revoke")) {
         	cmdName = "Revoke";
         	cmdDesc = "Removes a title from a player";
         	cmdUsage = "/title revoke <name> <title>";
@@ -170,6 +171,10 @@ public class TitleCommands implements CommandExecutor {
         	Player target;
         	Boolean self = true;
         	if (args.length > 2) {
+        		if (!checkPerm((Player) sender,"admin.clear")) {
+        			sendErr((Player) sender,"You do not have permission to clear other users");
+        			return true;
+        		}
         		target = Bukkit.getServer().getPlayer(args[2]);
         		self = false;
         	} else {
@@ -268,6 +273,19 @@ public class TitleCommands implements CommandExecutor {
         	return true;
         }
         
+        if (titleCommand("import",args,sender,"admin.import")) {
+        	cmdName = "Import";
+        	cmdDesc = "Imports titles from import.yml";
+        	cmdUsage = "/title import";
+        	if (args.length > 1 && args[1].equalsIgnoreCase("?")) {
+        		displayCmdHelp((Player) sender);
+        		return true;
+        	}
+        	
+        	Backup.importTitles(plugin.getDataFolder());
+        	
+        }
+        
         if (titleCommand("fulllist",args,sender) && (args.length == 1)) {
         	for (Title title : SGTitles.TitleList.values()) {
         		sender.sendMessage("[DEBUG] Title: " + title.getName() + " Data: " + TitleManager.replaceColors(title.getData()) + " Position:" + title.getPos() + ":");
@@ -289,6 +307,13 @@ public class TitleCommands implements CommandExecutor {
 	
 	private boolean titleCommand(String label,String[] args, CommandSender sender) {
 		if (args[0].equalsIgnoreCase(label) && checkPerm((Player) sender, label))
+			return true;
+		else
+			return false;
+	}
+	
+	private boolean titleCommand(String label,String[] args, CommandSender sender, String perm) {
+		if (args[0].equalsIgnoreCase(label) && checkPerm((Player) sender, perm))
 			return true;
 		else
 			return false;

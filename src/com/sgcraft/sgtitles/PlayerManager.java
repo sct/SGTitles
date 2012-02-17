@@ -21,6 +21,7 @@ public class PlayerManager {
 	
 	public static List<Title> getTitles(Player player) {
 		List<Title> titles = new ArrayList<Title>();
+		Title gTitle;
 		
 		try {
 			ResultSet rs = SGTitles.sql.query("SELECT * FROM player_titles WHERE player_name='" + player.getName() + "'");
@@ -29,7 +30,9 @@ public class PlayerManager {
 			}
 			rs.close();
 			for (String tName : SGTitles.config.getStringList("groups." + SGTitles.permission.getPrimaryGroup(player))) {
-				titles.add(TitleManager.get(tName));
+				gTitle = TitleManager.get(tName);
+				if (gTitle != null)
+					titles.add(gTitle);
 			}
 		} catch (SQLException e) {
 			// Catch error here!
