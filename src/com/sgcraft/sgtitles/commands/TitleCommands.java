@@ -294,7 +294,9 @@ public class TitleCommands implements CommandExecutor {
         	return true;
         }
         
-        return false;
+        displayHelp((Player) sender);
+        
+        return true;
 	}
 	
 	// Private Methods
