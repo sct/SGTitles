@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.entity.Player;
+import org.getspout.spoutapi.Spout;
+import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.sgcraft.sgtitles.title.Title;
 import com.sgcraft.sgtitles.title.TitleManager;
@@ -61,22 +63,26 @@ public class PlayerManager {
 		Title title = TitleManager.get(name);
 		if (title != null && checkTitle(player,title)) {
 			setActive(player,title);
-			player.setDisplayName(formatTitle(player));
+			refreshTitle(player);
 			return true;
 		}
 		return false;
 	}
 	
 	public static void refreshTitle(Player player) {
-		player.setDisplayName(formatTitle(player));
+		setSpoutTitle(player,formatTitle(player,true));
+		player.setDisplayName(formatTitle(player,false));
 	}
 	
-	public static String formatTitle(Player player) {
+	public static String formatTitle(Player player, Boolean spout) {
 		String oldName = player.getName();
 		String newName = player.getName();
 		if (Prefix.containsKey(oldName)) {
 			Title pTitle = Prefix.get(oldName);
-			newName = pTitle.getData() + newName;
+			if (spout == true)
+				newName = pTitle.getData() + "\n" + newName;
+			else
+				newName = pTitle.getData() + newName;
 		}
 		
 		if (Suffix.containsKey(oldName)) {
@@ -173,5 +179,10 @@ public class PlayerManager {
 		} catch (SQLException e) {
 			// Do exception stuff
 		}
+	}
+	
+	public static void setSpoutTitle(Player player, String title) {
+		SpoutPlayer sPlayer = Spout.getServer().getPlayerExact(player.getName());
+		sPlayer.setTitle(title);
 	}
 }
