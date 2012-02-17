@@ -295,7 +295,7 @@ public class TitleCommands implements CommandExecutor {
 	}
 	
 	private void sendMsg(Player player, String msg) {
-		player.sendMessage("§5[§6SGTitles§5] §f" + msg);
+		player.sendMessage("§5[§6" + pluginName + "§5] §f" + msg);
 	}
 	
 	private void sendErr(Player player, String msg) {
