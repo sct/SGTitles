@@ -1,11 +1,14 @@
 package com.sgcraft.sgtitles;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
 import lib.PatPeter.SQLibrary.*;
 
 import net.milkbowl.vault.permission.Permission;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -47,11 +50,19 @@ public class SGTitles extends JavaPlugin {
 		logger.info("[" + pdf.getName() + "] v" + pdf.getVersion() + " is now enabled!");
 	}
 	
+	public static List<ChatColor> getAllColors() {
+		List<ChatColor> colors = new ArrayList<ChatColor>();
+		for (ChatColor color : ChatColor.values()) {
+			colors.add(color);
+		}
+		return colors;
+	}
+	
 	private void addCommands() {
 		getCommand("title").setExecutor(new TitleCommands(this));
 	}
 	
-	public void startListeners() {
+	private void startListeners() {
 		getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 	}
 	
@@ -63,7 +74,7 @@ public class SGTitles extends JavaPlugin {
 		sql.createTable("CREATE TABLE if not exists player_titles (id INTEGER PRIMARY KEY AUTOINCREMENT, player_name TEXT NOT NULL, title_name INTEGER NOT NULL)");
 		
 		// Active Title Database
-		sql.createTable("CREATE TABLE if not exists active_titles (player_name TEXT NOT NULL, title_prefix TEXT, title_suffix TEXT)");
+		sql.createTable("CREATE TABLE if not exists active_titles (player_name TEXT NOT NULL, title_prefix TEXT, title_suffix TEXT, title_color TEXT)");
 	}
 	
 	private Boolean setupPermissions()

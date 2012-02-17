@@ -3,6 +3,7 @@ package com.sgcraft.sgtitles.commands;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -129,6 +130,8 @@ public class TitleCommands implements CommandExecutor {
         		PlayerManager.clearActive(target, "prefix");
         	} else if (args[1].equalsIgnoreCase("suffix")) {
         		PlayerManager.clearActive(target, "suffix");
+        	} else if (args[1].equalsIgnoreCase("color")) {
+        		PlayerManager.clearActive(target, "color");
         	} else {
         		sender.sendMessage("[SGTitles] You need to enter either prefix or suffix!");
         		return true;
@@ -175,6 +178,22 @@ public class TitleCommands implements CommandExecutor {
         	if (total == 0)
         		sender.sendMessage("No titles");
         	sender.sendMessage("---------------------------------------");
+        	return true;
+        }
+        
+        if (titleCommand("color",args,sender) && (args.length >= 1)) {
+        	if (args.length == 1) {
+        		for (ChatColor color : SGTitles.getAllColors()) {
+        			if (sender.isOp() || sender.hasPermission("sgtitles.color." + color.name().toLowerCase())) {
+        				sender.sendMessage(color.toString() + color.name());
+        			}
+        		}
+        	} else {
+        		if (sender.isOp() || sender.hasPermission("sgtitles.color." + args[1].toLowerCase())) {
+        			PlayerManager.setColor((Player) sender, args[1].toUpperCase());
+        			sender.sendMessage("[SGTitles] Your color has been changed!");
+        		}
+        	}
         	return true;
         }
         

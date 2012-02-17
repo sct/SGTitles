@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.getspout.spoutapi.Spout;
 import org.getspout.spoutapi.player.SpoutPlayer;
@@ -16,15 +17,13 @@ import com.sgcraft.sgtitles.title.TitleManager;
 public class PlayerManager {
 	public static HashMap<String, Title> Suffix = new HashMap<String, Title>();
 	public static HashMap<String, Title> Prefix = new HashMap<String, Title>();
+	public static HashMap<String, ChatColor> Color = new HashMap<String, ChatColor>();
 	
 	public static List<Title> getTitles(Player player) {
 		List<Title> titles = new ArrayList<Title>();
 		
 		try {
 			ResultSet rs = SGTitles.sql.query("SELECT * FROM player_titles WHERE player_name='" + player.getName() + "'");
-			/*int count = rs.getInt("counted");
-			if (count == 0)
-				return null;*/
 			while (rs.next()) {
 				titles.add(TitleManager.get(rs.getString("title_name")));
 			}
@@ -76,7 +75,7 @@ public class PlayerManager {
 	
 	public static String formatTitle(Player player, Boolean spout) {
 		String oldName = player.getName();
-		String newName = player.getName();
+		String newName = formatColor(player.getName());
 		if (Prefix.containsKey(oldName)) {
 			Title pTitle = Prefix.get(oldName);
 			if (spout == true)
@@ -91,6 +90,38 @@ public class PlayerManager {
 		}
 		
 		return TitleManager.replaceColors(newName);
+	}
+	
+	public static String formatColor(String pName) {
+		ChatColor color = getColor(pName);
+		pName = color.toString() + pName;
+		return pName;
+	}
+	
+	public static void setColor(Player player, ChatColor color) {
+		Color.put(player.getName(), color);
+		setActive(player,color);
+		refreshTitle(player);
+	}
+	
+	public static void setColor(Player player, String cName) {
+		try {
+			ChatColor color = ChatColor.valueOf(cName);
+			setColor(player, color);
+		} catch (Exception e) {
+			e.getMessage();
+		}
+	}
+	
+	public static ChatColor getColor(String pName) {
+		ChatColor color = null;
+		if (Color.containsKey(pName)) {
+			color = Color.get(pName);
+		} else {
+			color = ChatColor.valueOf("WHITE");
+		}
+		
+		return color;
 	}
 	
 	public static Boolean giveTitle(Player player, String name) {
@@ -125,9 +156,12 @@ public class PlayerManager {
 		if (position.equalsIgnoreCase("prefix")) {
 			SGTitles.sql.query("UPDATE active_titles SET title_prefix=NULL WHERE player_name='" + player.getName() + "'");
 			Prefix.remove(pName);
-		} else {
+		} else if (position.equalsIgnoreCase("suffix")) {
 			SGTitles.sql.query("UPDATE active_titles SET title_suffix=NULL WHERE player_name='" + player.getName() + "'");
 			Suffix.remove(pName);
+		} else if (position.equalsIgnoreCase("color")) {
+			SGTitles.sql.query("UPDATE active_titles SET title_color=NULL WHERE player_name='" + player.getName() + "'");
+			Color.remove(pName);
 		}
 	}
 	
@@ -145,13 +179,20 @@ public class PlayerManager {
 		
 	}
 	
+	public static void setActive(Player player, ChatColor color) {
+		//make sure the player has an SQL record
+		createRecord(player);
+		
+		SGTitles.sql.query("UPDATE active_titles SET title_color='" + color.name().toUpperCase() + "' WHERE player_name='" + player.getName() + "'");
+	}
+	
 	public static void loadRecord(Player player) {
 		try {
-			ResultSet rs = SGTitles.sql.query("SELECT count(player_name) AS counted,title_prefix,title_suffix FROM active_titles WHERE player_name='" + player.getName() + "'");
+			ResultSet rs = SGTitles.sql.query("SELECT count(player_name) AS counted,title_prefix,title_suffix,title_color FROM active_titles WHERE player_name='" + player.getName() + "'");
 			int count = rs.getInt("counted");
 			String pName = rs.getString("title_prefix");
 			String sName = rs.getString("title_suffix");
-			player.sendMessage("[DEBUG] sname = " + sName);
+			String cName = rs.getString("title_color");
 			if (count > 0) {
 				if (pName != null) {
 					Prefix.put(player.getName(), SGTitles.TitleList.get(pName));
@@ -160,6 +201,11 @@ public class PlayerManager {
 				if (sName != null) {
 					Suffix.put(player.getName(), SGTitles.TitleList.get(sName));
 				}
+				
+				if (cName != null) {
+					Color.put(player.getName(), ChatColor.valueOf(cName));
+				}
+				
 				refreshTitle(player);
 			}
 			rs.close();
