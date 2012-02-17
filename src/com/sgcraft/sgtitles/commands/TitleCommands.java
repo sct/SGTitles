@@ -283,7 +283,8 @@ public class TitleCommands implements CommandExecutor {
         	}
         	
         	Backup.importTitles(plugin.getDataFolder());
-        	
+        	sendMsg((Player) sender,"Import success!");
+        	return true;
         }
         
         if (titleCommand("fulllist",args,sender) && (args.length == 1)) {
