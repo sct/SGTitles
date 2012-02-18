@@ -32,6 +32,43 @@ public class TitleCommands implements CommandExecutor {
 		pluginVersion = pdf.getVersion();
 	}
 
+	private boolean checkPerm(Player player, String perm) {
+		if (player.isOp() || player.hasPermission(pluginName.toLowerCase() + "." + perm.toLowerCase()))
+			return true;
+		else
+			return false;
+	}
+	
+	private void displayCmdHelp(Player player) {
+		player.sendMessage("§5[§6 " + pluginName + " Help §5]§f--------------------------");
+		player.sendMessage("§f| §bCommand: §3" + cmdName);
+		player.sendMessage("§f| §bDescription: §3" + cmdDesc);
+		player.sendMessage("§f| §bUsage: §3" + cmdUsage);
+		player.sendMessage("§5[§6 " + pluginName + " Help §5]§f--------------------------");
+	}
+	
+	private void displayHelp(Player player) {
+		player.sendMessage("§5[§6 " + pluginName + " Help §5]§f--------------------------");
+		player.sendMessage("§f| §b/title list §3[user]");
+		player.sendMessage("§f| §b/title set §3<title>");
+		player.sendMessage("§f| §b/title color §3[color]");
+		if (checkPerm(player,"admin.clear"))
+			player.sendMessage("§f| §b/title clear §3<prefix/suffix/color> [user]");
+		else
+			player.sendMessage("§f| §b/title clear §3<prefix/suffix/color>");
+		if (checkPerm(player,"admin.add"))
+			player.sendMessage("§f| §b/title add §3<user> <title>");
+		if (checkPerm(player,"admin.revoke"))
+			player.sendMessage("§f| §b/title revoke §3<user> <title>");
+		if (checkPerm(player,"admin.create"))
+			player.sendMessage("§f| §b/title create §3<name> <data> <prefix/suffix>");
+		if (checkPerm(player,"admin.modify"))
+			player.sendMessage("§f| §b/title modify §3<name> <data> [prefix/suffix]");
+		if (checkPerm(player,"admin.delete"))
+			player.sendMessage("§f| §b/title delete §3<name>");
+		player.sendMessage("§5[§6 " + pluginName + " Help §5]§f--------------------------");
+	}
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
@@ -111,6 +148,35 @@ public class TitleCommands implements CommandExecutor {
         	}
         	return true;
         	
+        }
+        
+        if (titleCommand("modify",args,sender,"admin.modify")) {
+        	cmdName = "Modify";
+        	cmdDesc = "Modifies an existing title";
+        	cmdUsage = "/title modify <name> <data> [prefix/suffix]";
+        	if (args.length < 3 || args[1].equalsIgnoreCase("?")) {
+        		displayCmdHelp((Player) sender);
+        		return true;
+        	}
+        	
+        	if (args.length == 4 && !args[3].equalsIgnoreCase("prefix") && !args[3].equalsIgnoreCase("suffix")) {
+        		sendErr((Player) sender,"The title must be a prefix or suffix!");
+        		return true;
+        	}
+        	
+        	Title title = TitleManager.get(args[1]);
+        	if (title != null) {
+        		if (args.length == 4)
+        			TitleManager.updateTitle(title, args[2], args[3]);
+        		else
+        			TitleManager.updateTitle(title, args[2], title.getPos());
+        		sendMsg((Player) sender,"Title successfully updated!");
+        	} else {
+        		sendErr((Player) sender,"That title does not exist");
+        	}
+        	
+        	
+        	return true;
         }
         
         if (titleCommand("delete",args,sender,"admin.delete")) {
@@ -299,13 +365,13 @@ public class TitleCommands implements CommandExecutor {
         return true;
 	}
 	
-	// Private Methods
+	private void sendErr(Player player, String msg) {
+		msg = "§c" + msg;
+		sendMsg(player,msg);
+	}
 	
-	private boolean checkPerm(Player player, String perm) {
-		if (player.isOp() || player.hasPermission(pluginName.toLowerCase() + "." + perm.toLowerCase()))
-			return true;
-		else
-			return false;
+	private void sendMsg(Player player, String msg) {
+		player.sendMessage("§5[§6" + pluginName + "§5] §f" + msg);
 	}
 	
 	private boolean titleCommand(String label,String[] args, CommandSender sender) {
@@ -320,42 +386,5 @@ public class TitleCommands implements CommandExecutor {
 			return true;
 		else
 			return false;
-	}
-	
-	private void sendMsg(Player player, String msg) {
-		player.sendMessage("§5[§6" + pluginName + "§5] §f" + msg);
-	}
-	
-	private void sendErr(Player player, String msg) {
-		msg = "§c" + msg;
-		sendMsg(player,msg);
-	}
-	
-	private void displayHelp(Player player) {
-		player.sendMessage("§5[§6 " + pluginName + " Help §5]§f--------------------------");
-		player.sendMessage("§f| §b/title list §3[user]");
-		player.sendMessage("§f| §b/title set §3<title>");
-		player.sendMessage("§f| §b/title color §3[color]");
-		if (checkPerm(player,"admin.clear"))
-			player.sendMessage("§f| §b/title clear §3<prefix/suffix/color> [user]");
-		else
-			player.sendMessage("§f| §b/title clear §3<prefix/suffix/color>");
-		if (checkPerm(player,"admin.add"))
-			player.sendMessage("§f| §b/title add §3<user> <title>");
-		if (checkPerm(player,"admin.revoke"))
-			player.sendMessage("§f| §b/title revoke §3<user> <title>");
-		if (checkPerm(player,"admin.create"))
-			player.sendMessage("§f| §b/title create §3<name> <data> <prefix/suffix>");
-		if (checkPerm(player,"admin.delete"))
-			player.sendMessage("§f| §b/title delete §3<name>");
-		player.sendMessage("§5[§6 " + pluginName + " Help §5]§f--------------------------");
-	}
-	
-	private void displayCmdHelp(Player player) {
-		player.sendMessage("§5[§6 " + pluginName + " Help §5]§f--------------------------");
-		player.sendMessage("§f| §bCommand: §3" + cmdName);
-		player.sendMessage("§f| §bDescription: §3" + cmdDesc);
-		player.sendMessage("§f| §bUsage: §3" + cmdUsage);
-		player.sendMessage("§5[§6 " + pluginName + " Help §5]§f--------------------------");
 	}
 }

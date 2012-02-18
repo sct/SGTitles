@@ -9,6 +9,20 @@ import com.sgcraft.sgtitles.SGTitles;
 
 public class TitleManager {
 	
+	public static void addTitle(String name, String data, String position) {
+		Title newtitle = new Title(name,data,position);
+		if (newtitle.getName() != null) {
+			SGTitles.TitleList.put(name, newtitle);
+		}
+	}
+	
+	public static Title get(String name) {
+		if (SGTitles.TitleList.containsKey(name)) {
+			return SGTitles.TitleList.get(name);
+		}
+		return null;
+	}
+	
 	public static void loadAllTitles() {
 		List<String> tmpNames = new ArrayList<String>();
 		try {
@@ -32,18 +46,10 @@ public class TitleManager {
 		SGTitles.TitleList.put(name,newtitle);
 	}
 	
-	public static Title get(String name) {
-		if (SGTitles.TitleList.containsKey(name)) {
-			return SGTitles.TitleList.get(name);
-		}
-		return null;
-	}
-	
-	public static void addTitle(String name, String data, String position) {
-		Title newtitle = new Title(name,data,position);
-		if (newtitle.getName() != null) {
-			SGTitles.TitleList.put(name, newtitle);
-		}
+	public static void updateTitle(Title mTitle,String data, String position) {
+		mTitle.setData(data);
+		mTitle.setPos(position);
+		mTitle.save();
 	}
 	
 	public static void removeTitle(Title title) {

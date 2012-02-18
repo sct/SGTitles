@@ -10,7 +10,12 @@ public class Title {
 	public String name;
 	public String data;
 	public String position;
+	
 	public final Logger logger = Logger.getLogger("Minecraft");
+	
+	public Title(String name) {
+		this.name = name;
+	}
 	
 	public Title(String name, String data, String position) {
 		if (!exists(name)) {
@@ -21,21 +26,30 @@ public class Title {
 		}
 	}
 	
-	public Title(String name) {
-		this.name = name;
+	public String getData() {
+		return this.data;
 	}
 	
 	public String getName() {
 		return this.name;
 	}
 	
-	public String getData() {
-		return this.data;
-	}
-	
 	public String getPos() {
 		return this.position;
 	}
+	
+	public void setData(String data) {
+		this.data = data;
+	}
+	
+	public void setPos(String position) {
+		this.position = position;
+	}
+	
+	public void save() {
+		SGTitles.sql.query("UPDATE titles SET data='" + this.data + "',position='" + this.position + "' WHERE name='" + this.name + "'");
+	}
+	
 	
 	public Boolean isPrefix() {
 		if (this.position.equalsIgnoreCase("prefix"))
@@ -51,7 +65,18 @@ public class Title {
 			return false;
 	}
 	
-	// Static Methods
+	public static Boolean exists(String name) {
+		try {
+			ResultSet rs = SGTitles.sql.query("SELECT count(id) AS counted FROM titles WHERE name='" + name + "'");
+			int counted = rs.getInt("counted");
+			rs.close();
+			if (counted > 0)
+				return true;
+		} catch (SQLException e) {
+			// Do stuff?
+		}
+		return false;
+	}
 	
 	public static Title load(String name) {
 		Title title = new Title(name);
@@ -73,19 +98,6 @@ public class Title {
 				logger.info(e.getMessage());
 			}
 		}
-	}
-	
-	public static Boolean exists(String name) {
-		try {
-			ResultSet rs = SGTitles.sql.query("SELECT count(id) AS counted FROM titles WHERE name='" + name + "'");
-			int counted = rs.getInt("counted");
-			rs.close();
-			if (counted > 0)
-				return true;
-		} catch (SQLException e) {
-			// Do stuff?
-		}
-		return false;
 	}
 
 }

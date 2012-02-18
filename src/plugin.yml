@@ -1,6 +1,6 @@
 name: SGTitles
 main: com.sgcraft.sgtitles.SGTitles
-version: 0.1
+version: 0.3
 author: SGCraft
 commands:
   title:

@@ -19,26 +19,14 @@ public class PlayerManager {
 	public static HashMap<String, Title> Prefix = new HashMap<String, Title>();
 	public static HashMap<String, ChatColor> Color = new HashMap<String, ChatColor>();
 	
-	public static List<Title> getTitles(Player player) {
-		List<Title> titles = new ArrayList<Title>();
-		Title gTitle;
-		
-		try {
-			ResultSet rs = SGTitles.sql.query("SELECT * FROM player_titles WHERE player_name='" + player.getName() + "'");
-			while (rs.next()) {
-				titles.add(TitleManager.get(rs.getString("title_name")));
-			}
-			rs.close();
-			for (String tName : SGTitles.config.getStringList("groups." + SGTitles.permission.getPrimaryGroup(player))) {
-				gTitle = TitleManager.get(tName);
-				if (gTitle != null)
-					titles.add(gTitle);
-			}
-		} catch (SQLException e) {
-			// Catch error here!
+	public static Boolean applyTitle(Player player, String name) {
+		Title title = TitleManager.get(name);
+		if (title != null && checkTitle(player,title)) {
+			setActive(player,title);
+			refreshTitle(player);
+			return true;
 		}
-		
-		return titles;
+		return false;
 	}
 	
 	public static Boolean checkTitle(Player player, Title title) {
@@ -61,19 +49,37 @@ public class PlayerManager {
 		return false;
 	}
 	
-	public static Boolean applyTitle(Player player, String name) {
-		Title title = TitleManager.get(name);
-		if (title != null && checkTitle(player,title)) {
-			setActive(player,title);
-			refreshTitle(player);
-			return true;
+	public static void clearActive(Player player, String position) {
+		String pName = player.getName();
+		if (position.equalsIgnoreCase("prefix")) {
+			SGTitles.sql.query("UPDATE active_titles SET title_prefix=NULL WHERE player_name='" + player.getName() + "'");
+			Prefix.remove(pName);
+		} else if (position.equalsIgnoreCase("suffix")) {
+			SGTitles.sql.query("UPDATE active_titles SET title_suffix=NULL WHERE player_name='" + player.getName() + "'");
+			Suffix.remove(pName);
+		} else if (position.equalsIgnoreCase("color")) {
+			SGTitles.sql.query("UPDATE active_titles SET title_color=NULL WHERE player_name='" + player.getName() + "'");
+			Color.remove(pName);
 		}
-		return false;
 	}
 	
-	public static void refreshTitle(Player player) {
-		setSpoutTitle(player,formatTitle(player,true));
-		player.setDisplayName(formatTitle(player,false));
+	public static void createRecord(Player player) {
+		try {
+			ResultSet rs = SGTitles.sql.query("SELECT count(player_name) AS counted FROM active_titles WHERE player_name='" + player.getName() + "'");
+			int count = rs.getInt("counted");
+			rs.close();
+			if (count == 0) {
+				SGTitles.sql.query("INSERT INTO active_titles (player_name) VALUES ('" + player.getName() + "')");
+			}
+		} catch (SQLException e) {
+			// Do exception stuff
+		}
+	}
+	
+	public static String formatColor(String pName) {
+		ChatColor color = getColor(pName);
+		pName = color.toString() + pName;
+		return pName;
 	}
 	
 	public static String formatTitle(Player player, Boolean spout) {
@@ -95,27 +101,6 @@ public class PlayerManager {
 		return TitleManager.replaceColors(newName);
 	}
 	
-	public static String formatColor(String pName) {
-		ChatColor color = getColor(pName);
-		pName = color.toString() + pName;
-		return pName;
-	}
-	
-	public static void setColor(Player player, ChatColor color) {
-		Color.put(player.getName(), color);
-		setActive(player,color);
-		refreshTitle(player);
-	}
-	
-	public static void setColor(Player player, String cName) {
-		try {
-			ChatColor color = ChatColor.valueOf(cName);
-			setColor(player, color);
-		} catch (Exception e) {
-			e.getMessage();
-		}
-	}
-	
 	public static ChatColor getColor(String pName) {
 		ChatColor color = null;
 		if (Color.containsKey(pName)) {
@@ -127,6 +112,28 @@ public class PlayerManager {
 		return color;
 	}
 	
+	public static List<Title> getTitles(Player player) {
+		List<Title> titles = new ArrayList<Title>();
+		Title gTitle;
+		
+		try {
+			ResultSet rs = SGTitles.sql.query("SELECT * FROM player_titles WHERE player_name='" + player.getName() + "'");
+			while (rs.next()) {
+				titles.add(TitleManager.get(rs.getString("title_name")));
+			}
+			rs.close();
+			for (String tName : SGTitles.config.getStringList("groups." + SGTitles.permission.getPrimaryGroup(player))) {
+				gTitle = TitleManager.get(tName);
+				if (gTitle != null)
+					titles.add(gTitle);
+			}
+		} catch (SQLException e) {
+			// Catch error here!
+		}
+		
+		return titles;
+	}
+	
 	public static Boolean giveTitle(Player player, String name) {
 		Title title = TitleManager.get(name);
 		String pName = player.getName();
@@ -136,57 +143,6 @@ public class PlayerManager {
 		}
 		
 		return false;
-	}
-	
-	public static Boolean revokeTitle(Player player, String name) {
-		Title title = TitleManager.get(name);
-		String pName = player.getName();
-		if (!pName.isEmpty() && title != null) {
-			SGTitles.sql.query("DELETE FROM player_titles WHERE player_name='" + pName + "' AND title_name='" + title.getName() + "'");
-			if (title.isPrefix() && Prefix.get(pName).getName() == title.getName())
-				clearActive(player,"prefix");
-			else if (title.isSuffix() && Suffix.get(pName).getName() == title.getName())
-				clearActive(player,"suffix");
-			refreshTitle(player);
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public static void clearActive(Player player, String position) {
-		String pName = player.getName();
-		if (position.equalsIgnoreCase("prefix")) {
-			SGTitles.sql.query("UPDATE active_titles SET title_prefix=NULL WHERE player_name='" + player.getName() + "'");
-			Prefix.remove(pName);
-		} else if (position.equalsIgnoreCase("suffix")) {
-			SGTitles.sql.query("UPDATE active_titles SET title_suffix=NULL WHERE player_name='" + player.getName() + "'");
-			Suffix.remove(pName);
-		} else if (position.equalsIgnoreCase("color")) {
-			SGTitles.sql.query("UPDATE active_titles SET title_color=NULL WHERE player_name='" + player.getName() + "'");
-			Color.remove(pName);
-		}
-	}
-	
-	public static void setActive(Player player, Title title) {
-		//make sure the player has an SQL record
-		createRecord(player);
-		
-		if (title.isPrefix()) {
-			SGTitles.sql.query("UPDATE active_titles SET title_prefix='" + title.getName() + "' WHERE player_name='" + player.getName() + "'");
-			Prefix.put(player.getName(), title);
-		} else {
-			SGTitles.sql.query("UPDATE active_titles SET title_suffix='" + title.getName() + "' WHERE player_name='" + player.getName() + "'");
-			Suffix.put(player.getName(), title);
-		}
-		
-	}
-	
-	public static void setActive(Player player, ChatColor color) {
-		//make sure the player has an SQL record
-		createRecord(player);
-		
-		SGTitles.sql.query("UPDATE active_titles SET title_color='" + color.name().toUpperCase() + "' WHERE player_name='" + player.getName() + "'");
 	}
 	
 	public static void loadRecord(Player player) {
@@ -217,16 +173,60 @@ public class PlayerManager {
 		}
 	}
 	
-	public static void createRecord(Player player) {
+	public static void refreshTitle(Player player) {
+		setSpoutTitle(player,formatTitle(player,true));
+		player.setDisplayName(formatTitle(player,false));
+	}
+	
+	public static Boolean revokeTitle(Player player, String name) {
+		Title title = TitleManager.get(name);
+		String pName = player.getName();
+		if (!pName.isEmpty() && title != null) {
+			SGTitles.sql.query("DELETE FROM player_titles WHERE player_name='" + pName + "' AND title_name='" + title.getName() + "'");
+			if (title.isPrefix() && Prefix.get(pName).getName() == title.getName())
+				clearActive(player,"prefix");
+			else if (title.isSuffix() && Suffix.get(pName).getName() == title.getName())
+				clearActive(player,"suffix");
+			refreshTitle(player);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public static void setActive(Player player, ChatColor color) {
+		//make sure the player has an SQL record
+		createRecord(player);
+		
+		SGTitles.sql.query("UPDATE active_titles SET title_color='" + color.name().toUpperCase() + "' WHERE player_name='" + player.getName() + "'");
+	}
+	
+	public static void setActive(Player player, Title title) {
+		//make sure the player has an SQL record
+		createRecord(player);
+		
+		if (title.isPrefix()) {
+			SGTitles.sql.query("UPDATE active_titles SET title_prefix='" + title.getName() + "' WHERE player_name='" + player.getName() + "'");
+			Prefix.put(player.getName(), title);
+		} else {
+			SGTitles.sql.query("UPDATE active_titles SET title_suffix='" + title.getName() + "' WHERE player_name='" + player.getName() + "'");
+			Suffix.put(player.getName(), title);
+		}
+		
+	}
+	
+	public static void setColor(Player player, ChatColor color) {
+		Color.put(player.getName(), color);
+		setActive(player,color);
+		refreshTitle(player);
+	}
+	
+	public static void setColor(Player player, String cName) {
 		try {
-			ResultSet rs = SGTitles.sql.query("SELECT count(player_name) AS counted FROM active_titles WHERE player_name='" + player.getName() + "'");
-			int count = rs.getInt("counted");
-			rs.close();
-			if (count == 0) {
-				SGTitles.sql.query("INSERT INTO active_titles (player_name) VALUES ('" + player.getName() + "')");
-			}
-		} catch (SQLException e) {
-			// Do exception stuff
+			ChatColor color = ChatColor.valueOf(cName);
+			setColor(player, color);
+		} catch (Exception e) {
+			e.getMessage();
 		}
 	}
 	

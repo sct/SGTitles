@@ -1,3 +1,6 @@
 groups:
     Admin:
     - epic
+mcmmo:
+    level-required: 250
+    default-format: '[#skill#]'

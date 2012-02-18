@@ -17,5 +17,6 @@
 			<attribute name="javadoc_location" value="http://jd.spout.org/plugin/recommended/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/sct/Documents/mcsv_dev/plugins/mcMMO.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

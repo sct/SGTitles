@@ -10,10 +10,12 @@ import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.gmail.nossr50.mcMMO;
 import com.sgcraft.sgtitles.commands.TitleCommands;
 import com.sgcraft.sgtitles.title.Title;
 import com.sgcraft.sgtitles.title.TitleManager;
@@ -25,30 +27,7 @@ public class SGTitles extends JavaPlugin {
 	public static SQLite sql;
 	public static HashMap<String, Title> TitleList = new HashMap<String, Title>();  
 	public static Permission permission = null;
-	
-	@Override
-	public void onDisable() {
-		PluginDescriptionFile pdf = this.getDescription();
-		logger.info("[" + pdf.getName() + "] is now disabled!");
-	}
-	
-	@Override
-	public void onEnable() {
-		PluginDescriptionFile pdf = this.getDescription();
-		// Create Config
-		config = getConfig();
-        config.options().copyDefaults(true);
-		saveConfig();
-		// Connect to SQLite DB
-		sql = new SQLite(logger, "[SGTitles]", "titles", getDataFolder().getPath());
-		// Create tables if they dont exist
-		createTables();
-		addCommands();
-		startListeners();
-		setupPermissions();
-		TitleManager.loadAllTitles();
-		logger.info("[" + pdf.getName() + "] v" + pdf.getVersion() + " is now enabled!");
-	}
+	public static mcMMO mcPlugin;
 	
 	public static List<ChatColor> getAllColors() {
 		List<ChatColor> colors = new ArrayList<ChatColor>();
@@ -62,8 +41,16 @@ public class SGTitles extends JavaPlugin {
 		getCommand("title").setExecutor(new TitleCommands(this));
 	}
 	
-	private void startListeners() {
-		getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+	private boolean checkMcMMO() {
+		Plugin mmo = getServer().getPluginManager().getPlugin("mcMMO");
+		if (mmo != null) {
+			mcPlugin = (mcMMO) mmo;
+			return true;
+		} else {
+			mcPlugin = null;
+			return false;
+		}
+		
 	}
 	
 	private void createTables() {
@@ -77,6 +64,31 @@ public class SGTitles extends JavaPlugin {
 		sql.createTable("CREATE TABLE if not exists active_titles (player_name TEXT NOT NULL, title_prefix TEXT, title_suffix TEXT, title_color TEXT)");
 	}
 	
+	@Override
+	public void onDisable() {
+		PluginDescriptionFile pdf = this.getDescription();
+		logger.info("[" + pdf.getName() + "] is now disabled!");
+	}
+	
+	@Override
+	public void onEnable() {
+		PluginDescriptionFile pdf = this.getDescription();
+		config = getConfig();
+        config.options().copyDefaults(true);
+		saveConfig();
+		sql = new SQLite(logger, "[ " + pdf.getName() + "]", "titles", getDataFolder().getPath());
+		createTables();
+		
+		if (checkMcMMO())
+			logger.info("[" + pdf.getName() + "] McMMO detected. Loading support...");
+		
+		addCommands();
+		startListeners();
+		setupPermissions();
+		TitleManager.loadAllTitles();
+		logger.info("[" + pdf.getName() + "] v" + pdf.getVersion() + " is now enabled!");
+	}
+	
 	private Boolean setupPermissions()
     {
         RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
@@ -85,4 +97,10 @@ public class SGTitles extends JavaPlugin {
         }
         return (permission != null);
     }
+	
+	private void startListeners() {
+		getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+		if (mcPlugin != null)
+			getServer().getPluginManager().registerEvents(new McMMOListener(this), this);
+	}
 }
