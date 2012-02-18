@@ -26,7 +26,7 @@ public class Backup {
 				logger.info("[SGTitles] [DEBUG] Title from import: " + title);
 				tData = titles.getString(title + ".data");
 				tPos = titles.getString(title + ".position");
-				TitleManager.addTitle(title.toLowerCase(), tData, tPos.toLowerCase());
+				TitleManager.addTitle(title.toLowerCase(), tData, tPos.toLowerCase(),true);
 			}
 		} else {
 			logger.info("[SGTitles] Failed import. Cannot find import.yml");

@@ -16,6 +16,18 @@ public class TitleManager {
 		}
 	}
 	
+	public static void addTitle(String name, String data, String position, Boolean overwrite) {
+		Title title = TitleManager.get(name);
+		if (title != null) {
+			updateTitle(title,data,position);
+		} else {
+			Title newtitle = new Title(name,data,position);
+			if (newtitle.getName() != null) {
+				SGTitles.TitleList.put(name, newtitle);
+			}
+		}
+	}
+	
 	public static Title get(String name) {
 		if (SGTitles.TitleList.containsKey(name)) {
 			return SGTitles.TitleList.get(name);

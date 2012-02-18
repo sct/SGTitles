@@ -38,9 +38,13 @@ public class PlayerManager {
 				return true;
 			
 			// Assign title by group!
-			for (String tName : SGTitles.config.getStringList("groups." + SGTitles.permission.getPrimaryGroup(player))) {
-				if (tName.equalsIgnoreCase(title.getName())) {
-					return true;
+			String[] pGroups = SGTitles.permission.getPlayerGroups(player);
+			
+			for (String group : pGroups) {
+				for (String tName : SGTitles.config.getStringList("groups." + group)) {
+					if (tName.equalsIgnoreCase(title.getName())) {
+						return true;
+					}
 				}
 			}
 		} catch (SQLException e) {
@@ -122,10 +126,13 @@ public class PlayerManager {
 				titles.add(TitleManager.get(rs.getString("title_name")));
 			}
 			rs.close();
-			for (String tName : SGTitles.config.getStringList("groups." + SGTitles.permission.getPrimaryGroup(player))) {
-				gTitle = TitleManager.get(tName);
-				if (gTitle != null)
-					titles.add(gTitle);
+			String[] pGroups = SGTitles.permission.getPlayerGroups(player);
+			for (String group : pGroups) {
+				for (String tName : SGTitles.config.getStringList("groups." + group)) {
+					gTitle = TitleManager.get(tName);
+					if (gTitle != null && !titles.contains(gTitle))
+						titles.add(gTitle);
+				}
 			}
 		} catch (SQLException e) {
 			// Catch error here!
