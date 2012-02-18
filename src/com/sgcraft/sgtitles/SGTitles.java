@@ -28,6 +28,7 @@ public class SGTitles extends JavaPlugin {
 	public static HashMap<String, Title> TitleList = new HashMap<String, Title>();  
 	public static Permission permission = null;
 	public static mcMMO mcPlugin;
+	public static boolean spoutEnabled = false;
 	
 	public static List<ChatColor> getAllColors() {
 		List<ChatColor> colors = new ArrayList<ChatColor>();
@@ -50,7 +51,15 @@ public class SGTitles extends JavaPlugin {
 			mcPlugin = null;
 			return false;
 		}
-		
+	}
+	
+	private boolean checkSpout() {
+		Plugin sPlugin = getServer().getPluginManager().getPlugin("Spout");
+		if (sPlugin != null) {
+			spoutEnabled = true;
+			return true;
+		} else
+			return false;
 	}
 	
 	private void createTables() {
@@ -81,6 +90,8 @@ public class SGTitles extends JavaPlugin {
 		
 		if (checkMcMMO())
 			logger.info("[" + pdf.getName() + "] McMMO detected. Loading support...");
+		if (checkSpout())
+			logger.info("[" + pdf.getName() + "] Spout detected. Loading support...");
 		
 		addCommands();
 		startListeners();

@@ -174,7 +174,8 @@ public class PlayerManager {
 	}
 	
 	public static void refreshTitle(Player player) {
-		setSpoutTitle(player,formatTitle(player,true));
+		if (SGTitles.spoutEnabled == true)
+			setSpoutTitle(player,formatTitle(player,true));
 		player.setDisplayName(formatTitle(player,false));
 	}
 	
