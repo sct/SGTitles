@@ -3,4 +3,5 @@ groups:
     - example
 mcmmo:
     level-required: 250
+    default-position: prefix
     default-format: '[#skill#]'
