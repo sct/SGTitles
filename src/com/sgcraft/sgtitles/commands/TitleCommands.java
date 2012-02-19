@@ -1,5 +1,6 @@
 package com.sgcraft.sgtitles.commands;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -35,8 +36,10 @@ public class TitleCommands implements CommandExecutor {
 	private boolean checkPerm(Player player, String perm) {
 		if (player.isOp() || player.hasPermission(pluginName.toLowerCase() + "." + perm.toLowerCase()))
 			return true;
-		else
+		else {
+			sendErr(player,"You do not have permission.");
 			return false;
+		}
 	}
 	
 	private void displayCmdHelp(Player player) {
@@ -350,6 +353,24 @@ public class TitleCommands implements CommandExecutor {
         	
         	Backup.importTitles(plugin.getDataFolder());
         	sendMsg((Player) sender,"Import success!");
+        	return true;
+        }
+        
+        if (titleCommand("export",args,sender,"admin.export")) {
+        	cmdName = "Export";
+        	cmdDesc = "Exports all titles to backup.yml";
+        	cmdUsage = "/title export";
+        	if (args.length > 1 && args[1].equalsIgnoreCase("?")) {
+        		displayCmdHelp((Player) sender);
+        		return true;
+        	}
+        	
+        	try {
+				Backup.exportTitles(plugin.getDataFolder());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        	sendMsg((Player) sender,"Export success!");
         	return true;
         }
         

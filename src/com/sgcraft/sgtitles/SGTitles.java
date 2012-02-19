@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.simiancage.DeathTpPlus.DeathTpPlus;
 
 import com.gmail.nossr50.mcMMO;
+import com.herocraftonline.dev.heroes.Heroes;
 import com.sgcraft.sgtitles.commands.TitleCommands;
 import com.sgcraft.sgtitles.title.Title;
 import com.sgcraft.sgtitles.title.TitleManager;
@@ -30,6 +31,7 @@ public class SGTitles extends JavaPlugin {
 	public static Permission permission = null;
 	public static mcMMO mcPlugin;
 	public static DeathTpPlus dtpPlugin;
+	public static Heroes hPlugin;
 	public static boolean spoutEnabled = false;
 	
 	public static List<ChatColor> getAllColors() {
@@ -46,7 +48,7 @@ public class SGTitles extends JavaPlugin {
 	
 	private boolean checkMcMMO() {
 		Plugin mmo = getServer().getPluginManager().getPlugin("mcMMO");
-		if (mmo != null) {
+		if (mmo != null && config.getBoolean("mcmmo.enabled")) {
 			mcPlugin = (mcMMO) mmo;
 			return true;
 		} else {
@@ -57,11 +59,22 @@ public class SGTitles extends JavaPlugin {
 	
 	private boolean checkDtp() {
 		Plugin dtp = getServer().getPluginManager().getPlugin("DeathTpPlus");
-		if (dtp != null) {
+		if (dtp != null && config.getBoolean("deathtp.enabled")) {
 			dtpPlugin = (DeathTpPlus) dtp;
 			return true;
 		} else {
 			dtpPlugin = null;
+			return false;
+		}
+	}
+	
+	private boolean checkHeroes() {
+		Plugin heroes = getServer().getPluginManager().getPlugin("Heroes");
+		if (heroes != null && config.getBoolean("heroes.enabled")) {
+			hPlugin = (Heroes) heroes;
+			return true;
+		} else {
+			hPlugin = null;
 			return false;
 		}
 	}
@@ -105,6 +118,8 @@ public class SGTitles extends JavaPlugin {
 			logger.info("[" + pdf.getName() + "] McMMO detected. Loading support...");
 		if (checkDtp())
 			logger.info("[" + pdf.getName() + "] DeathTpPlus detected. Loading support...");
+		if (checkHeroes())
+			logger.info("[" + pdf.getName() + "] Heroes detected. Loading support...");
 		if (checkSpout())
 			logger.info("[" + pdf.getName() + "] Spout detected. Loading support...");
 		
@@ -130,5 +145,7 @@ public class SGTitles extends JavaPlugin {
 			getServer().getPluginManager().registerEvents(new McMMOListener(this), this);
 		if (dtpPlugin != null)
 			getServer().getPluginManager().registerEvents(new DtpListener(this),this);
+		if (hPlugin != null)
+			getServer().getPluginManager().registerEvents(new HeroesListener(this), this);
 	}
 }

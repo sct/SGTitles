@@ -1,17 +1,22 @@
 package com.sgcraft.sgtitles.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import com.sgcraft.sgtitles.SGTitles;
+import com.sgcraft.sgtitles.title.Title;
 import com.sgcraft.sgtitles.title.TitleManager;
 
 public class Backup {
 	public static FileConfiguration importConfig;
+	public static FileConfiguration exportConfig;
 	static File importConfigFile = null;
+	static File exportConfigFile = null;
 	public static Logger logger = Logger.getLogger("Minecraft");
 	
 	public static void importTitles(File datafolder) {
@@ -31,5 +36,25 @@ public class Backup {
 		} else {
 			logger.info("[SGTitles] Failed import. Cannot find import.yml");
 		}
+	}
+	
+	public static void exportTitles(File datafolder) throws IOException {
+		
+		exportConfigFile = new File(datafolder,"export.yml");
+		if (!exportConfigFile.exists())
+			exportConfigFile.createNewFile();
+		else {
+			exportConfigFile.delete();
+			exportConfigFile.createNewFile();
+		}
+		
+		exportConfig = YamlConfiguration.loadConfiguration(exportConfigFile);
+		ConfigurationSection tSec = exportConfig.createSection("titles");
+		for (Title title : SGTitles.TitleList.values()) {
+			tSec.set(title.getName(), null);
+			tSec.set(title.getName() + ".data", title.getData());
+			tSec.set(title.getName() + ".position", title.getPos());
+		}
+		exportConfig.save(exportConfigFile);
 	}
 }

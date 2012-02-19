@@ -2,10 +2,25 @@ groups:
     Admin:
     - example
 mcmmo:
+    enabled: true
     level-required: 250
     default-position: prefix
     default-format: '[#skill#]'
+    skill-titles:
+        Acrobatics: Ninja
+        Archery: Marksman
+        Axes: Viking
+        Mining: Miner
+        Excavation: Excavator
+        Fishing: Angler
+        Herbalism: Farmer
+        Repair: Blacksmith
+        Swords: Fencer
+        Taming: Trainer
+        Unarmed: Berserker
+        Woodcutting: Lumberjack
 deathtp:
+    enabled: true
     default-position: prefix
     default-format: '[#title#]'
     kill-streak:
@@ -13,3 +28,7 @@ deathtp:
     - Demolisher:10
     multi-kill:
     - Reaver:2
+heroes:
+    enabled: true
+    default-position: prefix
+    default-format: '[#class#]'

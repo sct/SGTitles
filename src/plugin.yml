@@ -1,8 +1,11 @@
 name: SGTitles
 main: com.sgcraft.sgtitles.SGTitles
-version: 0.4
+version: 0.5
 author: SGCraft
+description: Elegant Title Management
+depend: [Vault]
+softdepend: [Spout,McMMO,DeathTPPlus,Heroes]
 commands:
   title:
     description: Manage Titles
-    usage: /title <add/set/create>
+    usage: /<command> <help>

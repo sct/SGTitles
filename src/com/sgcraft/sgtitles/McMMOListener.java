@@ -49,18 +49,18 @@ public class McMMOListener implements Listener {
 		Map<String,String> skills = new HashMap<String, String>();
 		String titleName = null;
 		
-		skills.put("ACROBATICS", "Ninja");
-		skills.put("ARCHERY", "Marksman");
-		skills.put("AXES", "Viking");
-		skills.put("MINING", "Miner");
-		skills.put("EXCAVATION","Excavator");
-		skills.put("FISHING", "Angler");
-		skills.put("HERBALISM","Farmer");
-		skills.put("REPAIR","Blacksmith");
-		skills.put("SWORDS","Fencer");
-		skills.put("TAMING","Trainer");
-		skills.put("UNARMED","Berseker");
-		skills.put("WOODCUTTING","Lumberjack");
+		skills.put("ACROBATICS", getSkl("Acrobatics"));
+		skills.put("ARCHERY", getSkl("Archery"));
+		skills.put("AXES", getSkl("Axes"));
+		skills.put("MINING", getSkl("Mining"));
+		skills.put("EXCAVATION", getSkl("Excavation"));
+		skills.put("FISHING", getSkl("Fishing"));
+		skills.put("HERBALISM",getSkl("Herbalism"));
+		skills.put("REPAIR", getSkl("Repair"));
+		skills.put("SWORDS", getSkl("Swords"));
+		skills.put("TAMING", getSkl("Taming"));
+		skills.put("UNARMED", getSkl("Unarmed"));
+		skills.put("WOODCUTTING", getSkl("Woodcutting"));
 		
 		
 		if (skills.containsKey(skillName))
@@ -68,5 +68,10 @@ public class McMMOListener implements Listener {
 			
 		
 		return titleName;
+	}
+	
+	private String getSkl(String skillName) {
+		String configSec = "mcmmo.skill-titles.";
+		return SGTitles.config.getString(configSec + skillName);
 	}
 }
