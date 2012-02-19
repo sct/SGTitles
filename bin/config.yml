@@ -9,4 +9,7 @@ deathtp:
     default-position: prefix
     default-format: '[#title#]'
     kill-streak:
-        5: Murderer
+    - Murderer:5
+    - Demolisher:10
+    multi-kill:
+    - Reaver:2

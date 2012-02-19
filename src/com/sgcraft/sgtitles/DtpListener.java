@@ -23,20 +23,25 @@ public class DtpListener implements Listener {
 		Player player = event.getPlayer();
 		Boolean isMultiKill = event.isMultiKill();
 		Integer kills = event.getKills();
+		Integer count = 0;
+		String titleName;
 		String cSec = "kill-streak";
 		String format = dSec.getString("default-format");
 		String position = dSec.getString("default-position");
-		String titleName;
 		
 		if (isMultiKill)
 			cSec = "multi-kill";
 		
-		for (String count : dSec.getStringList(cSec)) {
-			if (count.equalsIgnoreCase(kills.toString())) {
-				titleName = dSec.getString(cSec + "." + count);
+		plugin.logger.info("[DEBUG] " + cSec.toUpperCase() + " DETECTED! Player: " + player.getName() + " Kills: " + kills);
+		
+		for (String tempName : dSec.getStringList(cSec)) {
+			String[] sPrt = tempName.split(":");
+			titleName = sPrt[0];
+			count = Integer.valueOf(sPrt[1]);
+			if (count.equals(kills)) {
 				Title title = TitleManager.get(titleName.toLowerCase());
 				if (title == null) {
-					String data = format.replace("#skill#", titleName);
+					String data = format.replace("#title#", titleName);
 					TitleManager.addTitle(titleName.toLowerCase(), data, position);
 					title = TitleManager.get(titleName.toLowerCase());
 				}
