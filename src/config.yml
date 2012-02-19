@@ -5,3 +5,8 @@ mcmmo:
     level-required: 250
     default-position: prefix
     default-format: '[#skill#]'
+deathtp:
+    default-position: prefix
+    default-format: '[#title#]'
+    kill-streak:
+        5: Murderer

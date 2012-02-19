@@ -14,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.simiancage.DeathTpPlus.DeathTpPlus;
 
 import com.gmail.nossr50.mcMMO;
 import com.sgcraft.sgtitles.commands.TitleCommands;
@@ -28,6 +29,7 @@ public class SGTitles extends JavaPlugin {
 	public static HashMap<String, Title> TitleList = new HashMap<String, Title>();  
 	public static Permission permission = null;
 	public static mcMMO mcPlugin;
+	public static DeathTpPlus dtpPlugin;
 	public static boolean spoutEnabled = false;
 	
 	public static List<ChatColor> getAllColors() {
@@ -49,6 +51,17 @@ public class SGTitles extends JavaPlugin {
 			return true;
 		} else {
 			mcPlugin = null;
+			return false;
+		}
+	}
+	
+	private boolean checkDtp() {
+		Plugin dtp = getServer().getPluginManager().getPlugin("DeathTpPlus");
+		if (dtp != null) {
+			dtpPlugin = (DeathTpPlus) dtp;
+			return true;
+		} else {
+			dtpPlugin = null;
 			return false;
 		}
 	}
@@ -90,6 +103,8 @@ public class SGTitles extends JavaPlugin {
 		
 		if (checkMcMMO())
 			logger.info("[" + pdf.getName() + "] McMMO detected. Loading support...");
+		if (checkDtp())
+			logger.info("[" + pdf.getName() + "] DeathTpPlus detected. Loading support...");
 		if (checkSpout())
 			logger.info("[" + pdf.getName() + "] Spout detected. Loading support...");
 		
@@ -113,5 +128,7 @@ public class SGTitles extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 		if (mcPlugin != null)
 			getServer().getPluginManager().registerEvents(new McMMOListener(this), this);
+		if (dtpPlugin != null)
+			getServer().getPluginManager().registerEvents(new DtpListener(this),this);
 	}
 }
