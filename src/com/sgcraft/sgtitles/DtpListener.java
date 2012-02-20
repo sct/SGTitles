@@ -45,8 +45,10 @@ public class DtpListener implements Listener {
 					TitleManager.addTitle(titleName.toLowerCase(), data, position);
 					title = TitleManager.get(titleName.toLowerCase());
 				}
-				PlayerManager.giveTitle(player, titleName.toLowerCase());
-				player.sendMessage("§5[§6SGTitles§5] §fCongratulatons! You have been granted the title: " + titleName.toLowerCase());
+				if (!PlayerManager.checkTitle(player, title)) {
+					PlayerManager.giveTitle(player, titleName.toLowerCase());
+					player.sendMessage("§5[§6SGTitles§5] §fCongratulatons! You have been granted the title: " + titleName.toLowerCase());
+				}
 			}
 		}
 	}
