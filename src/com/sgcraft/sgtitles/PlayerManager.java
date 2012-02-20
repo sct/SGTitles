@@ -191,9 +191,9 @@ public class PlayerManager {
 		String pName = player.getName();
 		if (!pName.isEmpty() && title != null) {
 			SGTitles.sql.query("DELETE FROM player_titles WHERE player_name='" + pName + "' AND title_name='" + title.getName() + "'");
-			if (title.isPrefix() && Prefix.get(pName).getName() == title.getName())
+			if (title.isPrefix() && Prefix.containsKey(pName) && Prefix.get(pName).getName() == title.getName())
 				clearActive(player,"prefix");
-			else if (title.isSuffix() && Suffix.get(pName).getName() == title.getName())
+			else if (title.isSuffix() && Suffix.containsKey(pName) && Suffix.get(pName).getName() == title.getName())
 				clearActive(player,"suffix");
 			refreshTitle(player);
 			return true;

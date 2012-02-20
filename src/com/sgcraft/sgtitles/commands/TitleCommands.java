@@ -42,6 +42,14 @@ public class TitleCommands implements CommandExecutor {
 		}
 	}
 	
+	private boolean checkPerm(Player player, String perm, Boolean noerror) {
+		if (player.isOp() || player.hasPermission(pluginName.toLowerCase() + "." + perm.toLowerCase()))
+			return true;
+		else {
+			return false;
+		}
+	}
+	
 	private void displayCmdHelp(Player player) {
 		player.sendMessage("§5[§6 " + pluginName + " Help §5]§f--------------------------");
 		player.sendMessage("§f| §bCommand: §3" + cmdName);
@@ -55,19 +63,19 @@ public class TitleCommands implements CommandExecutor {
 		player.sendMessage("§f| §b/title list §3[user]");
 		player.sendMessage("§f| §b/title set §3<title>");
 		player.sendMessage("§f| §b/title color §3[color]");
-		if (checkPerm(player,"admin.clear"))
+		if (checkPerm(player,"admin.clear",true))
 			player.sendMessage("§f| §b/title clear §3<prefix/suffix/color> [user]");
 		else
 			player.sendMessage("§f| §b/title clear §3<prefix/suffix/color>");
-		if (checkPerm(player,"admin.add"))
+		if (checkPerm(player,"admin.add",true))
 			player.sendMessage("§f| §b/title add §3<user> <title>");
-		if (checkPerm(player,"admin.revoke"))
+		if (checkPerm(player,"admin.revoke",true))
 			player.sendMessage("§f| §b/title revoke §3<user> <title>");
-		if (checkPerm(player,"admin.create"))
+		if (checkPerm(player,"admin.create",true))
 			player.sendMessage("§f| §b/title create §3<name> <data> <prefix/suffix>");
-		if (checkPerm(player,"admin.modify"))
+		if (checkPerm(player,"admin.modify",true))
 			player.sendMessage("§f| §b/title modify §3<name> <data> [prefix/suffix]");
-		if (checkPerm(player,"admin.delete"))
+		if (checkPerm(player,"admin.delete",true))
 			player.sendMessage("§f| §b/title delete §3<name>");
 		player.sendMessage("§5[§6 " + pluginName + " Help §5]§f--------------------------");
 	}
@@ -240,7 +248,7 @@ public class TitleCommands implements CommandExecutor {
         	Player target;
         	Boolean self = true;
         	if (args.length > 2) {
-        		if (!checkPerm((Player) sender,"admin.clear")) {
+        		if (!checkPerm((Player) sender,"admin.clear",true)) {
         			sendErr((Player) sender,"You do not have permission to clear other users");
         			return true;
         		}
