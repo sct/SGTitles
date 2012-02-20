@@ -1,8 +1,14 @@
+default:
+    color-names-by-default: true
+    default-name-color: white
 groups:
     Admin:
     - example
+spout:
+    format: '#prefix#\n#player##suffix#'
 mcmmo:
     enabled: true
+    broadcast: false
     level-required: 250
     default-position: prefix
     default-format: '[#skill#]'
@@ -21,6 +27,7 @@ mcmmo:
         Woodcutting: Lumberjack
 deathtp:
     enabled: true
+    broadcast: false
     default-position: prefix
     default-format: '[#title#]'
     kill-streak:
@@ -30,5 +37,6 @@ deathtp:
     - Reaver:2
 heroes:
     enabled: true
+    broadcast: false
     default-position: prefix
     default-format: '[#class#]'

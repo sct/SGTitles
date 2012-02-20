@@ -82,24 +82,40 @@ public class PlayerManager {
 	
 	public static String formatColor(String pName) {
 		ChatColor color = getColor(pName);
-		pName = color.toString() + pName;
+		if (color != null)
+			pName = color.toString() + pName;
 		return pName;
 	}
 	
-	public static String formatTitle(Player player, Boolean spout) {
+	public static String formatTitle(Player player) {
 		String oldName = player.getName();
 		String newName = formatColor(player.getName());
+		String spoutName = formatColor(player.getName());
+		String spoutFormat = SGTitles.config.getString("spout.format");
+		Boolean spout = SGTitles.spoutEnabled;
+		
+		spoutName = spoutFormat.replace("#player#", spoutName);
+		
 		if (Prefix.containsKey(oldName)) {
 			Title pTitle = Prefix.get(oldName);
+			spoutName = spoutName.replace("#prefix#", pTitle.getData());
+			newName = pTitle.getData() + newName;
+		} else {
 			if (spout == true)
-				newName = pTitle.getData() + "\n" + newName;
-			else
-				newName = pTitle.getData() + newName;
+				spoutName = spoutName.replace("#prefix#","");
 		}
 		
 		if (Suffix.containsKey(oldName)) {
 			Title sTitle = Suffix.get(oldName);
+			spoutName = spoutName.replace("#suffix#",sTitle.getData());
 			newName = newName + sTitle.getData();
+		} else {
+			spoutName = spoutName.replace("#suffix#", "");
+		}
+		
+		if (spout == true) {
+			spoutName = spoutName.replace("\\n","\n");
+			setSpoutTitle(player,TitleManager.replaceColors(spoutName));
 		}
 		
 		return TitleManager.replaceColors(newName);
@@ -110,7 +126,11 @@ public class PlayerManager {
 		if (Color.containsKey(pName)) {
 			color = Color.get(pName);
 		} else {
-			color = ChatColor.valueOf("WHITE");
+			if (SGTitles.config.getBoolean("default.color-names-by-default")) {
+				color = ChatColor.valueOf(SGTitles.config.getString("default.default-name-color").toUpperCase());
+			} else {
+				color = null;
+			}
 		}
 		
 		return color;
@@ -181,9 +201,7 @@ public class PlayerManager {
 	}
 	
 	public static void refreshTitle(Player player) {
-		if (SGTitles.spoutEnabled == true)
-			setSpoutTitle(player,formatTitle(player,true));
-		player.setDisplayName(formatTitle(player,false));
+		player.setDisplayName(formatTitle(player));
 	}
 	
 	public static Boolean revokeTitle(Player player, String name) {

@@ -1,5 +1,6 @@
 package com.sgcraft.sgtitles;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -48,6 +49,8 @@ public class DtpListener implements Listener {
 				if (!PlayerManager.checkTitle(player, title)) {
 					PlayerManager.giveTitle(player, titleName.toLowerCase());
 					player.sendMessage("§5[§6SGTitles§5] §fCongratulatons! You have been granted the title: " + titleName.toLowerCase());
+					if (SGTitles.config.getBoolean("deathtp.broadcast"))
+						Bukkit.getServer().broadcastMessage("§5[§6SGTitles§5] §6" + player.getName() + "§3 unlocked the title §b" + titleName + "!");
 				}
 			}
 		}

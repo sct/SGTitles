@@ -1,6 +1,6 @@
 name: SGTitles
 main: com.sgcraft.sgtitles.SGTitles
-version: 0.5
+version: 0.6
 author: SGCraft
 description: Elegant Title Management
 depend: [Vault]
@@ -9,3 +9,43 @@ commands:
   title:
     description: Manage Titles
     usage: /<command> <help>
+permissions:
+  sgtitles.list:
+    default: true
+    description: List titles a user owns
+  sgtitles.set:
+    default: true
+    description: Allows a user to set a title they own
+  sgtitles.color:
+    default: true
+    description: Allows a user to change their name color
+  sgtitles.clear:
+    default: true
+    description: Lets a user clear their prefix/suffix/color
+  sgtitles.admin.add:
+    default: op
+    description: Grants a user a title
+  sgtitles.admin.revoke:
+    default: op
+    description: Revokes a title given to a user
+  sgtitles.admin.clear:
+    default: op
+    description: Clear another users title/color
+  sgtitles.admin.create:
+    default: op
+    description: Create a new title
+  sgtitles.admin.modify:
+    default: op
+    description: Modify an existing title
+  sgtitles.admin.delete:
+    default: op
+    description: Delete an existing title
+  sgtitles.admin.import:
+    default: op
+    description: Import titles from import.yml
+  sgtitles.admin.export:
+    default: op
+    description: Export all titles to backup.yml
+  sgtitles.admin.reload:
+    default: op
+    description: Reloads the config from disk

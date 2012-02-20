@@ -130,6 +130,12 @@ public class SGTitles extends JavaPlugin {
 		logger.info("[" + pdf.getName() + "] v" + pdf.getVersion() + " is now enabled!");
 	}
 	
+	public void reload() {
+		reloadConfig();
+		config = getConfig();
+		logger.info("[SGTitles] Config Reloaded!");
+	}
+	
 	private Boolean setupPermissions()
     {
         RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);

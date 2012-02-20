@@ -128,7 +128,7 @@ public class TitleCommands implements CommandExecutor {
         	}
         	
         	Player player = Bukkit.getServer().getPlayer(sender.getName());
-        	if (PlayerManager.applyTitle(player, args[1])) {
+        	if (PlayerManager.applyTitle(player, args[1].toLowerCase())) {
         		sendMsg((Player) sender,"Title has been applied!");
         	} else {
         		sendErr((Player) sender,"Title does not exist or you do not own it");
@@ -379,6 +379,21 @@ public class TitleCommands implements CommandExecutor {
 				e.printStackTrace();
 			}
         	sendMsg((Player) sender,"Export success!");
+        	return true;
+        }
+        
+        if (titleCommand("reload",args,sender,"admin.reload")) {
+        	cmdName = "Reload";
+        	cmdDesc = "Reloads config.yml";
+        	cmdUsage = "/title reload";
+        	if (args.length > 1 && args[1].equalsIgnoreCase("?")) {
+        		displayCmdHelp((Player) sender);
+        		return true;
+        	}
+        	
+        	plugin.reload();
+        	sendMsg((Player) sender,"Config reloaded!");
+        	
         	return true;
         }
         

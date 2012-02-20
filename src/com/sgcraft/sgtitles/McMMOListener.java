@@ -3,6 +3,7 @@ package com.sgcraft.sgtitles;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -32,7 +33,7 @@ public class McMMOListener implements Listener {
 		String format = SGTitles.config.getString("mcmmo.default-format");
 		String position = SGTitles.config.getString("mcmmo.default-position");
 		
-		if (profile.getSkillLevel(skill).equals(levelReq)) {
+		if (profile.getSkillLevel(skill) >= levelReq) {
 			// See if title already exists
 			Title title = TitleManager.get(titleName.toLowerCase());
 			if (title == null) {
@@ -40,8 +41,12 @@ public class McMMOListener implements Listener {
 				TitleManager.addTitle(titleName.toLowerCase(), data, position);
 				title = TitleManager.get(titleName.toLowerCase());
 			}
-			PlayerManager.giveTitle(player, titleName.toLowerCase());
-			player.sendMessage("§5[§6SGTitles§5] §fCongratulatons! You have been granted the title: " + titleName.toLowerCase());
+			if (!PlayerManager.checkTitle(player, title)) {
+				PlayerManager.giveTitle(player, titleName.toLowerCase());
+				player.sendMessage("§5[§6SGTitles§5] §fCongratulatons! You have been granted the title: " + titleName.toLowerCase());
+				if (SGTitles.config.getBoolean("mcmmo.broadcast"))
+					Bukkit.getServer().broadcastMessage("§5[§6SGTitles§5] §6" + player.getName() + "§3 unlocked the title §b" + titleName + "!");
+			}
 		}
 	}
 	
