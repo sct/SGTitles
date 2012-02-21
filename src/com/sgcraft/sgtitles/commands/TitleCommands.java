@@ -236,7 +236,7 @@ public class TitleCommands implements CommandExecutor {
         if (titleCommand("clear",args,sender)) {
         	cmdName = "Clear";
         	cmdDesc = "Clears an active title or title color";
-        	if (checkPerm((Player) sender,"admin.clear"))
+        	if (checkPerm((Player) sender,"admin.clear",true))
         		cmdUsage = "/title clear <prefix/suffix/color> [user]";
         	else
         		cmdUsage = "/title clear <prefix/suffix/color>";

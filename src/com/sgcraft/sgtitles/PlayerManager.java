@@ -4,13 +4,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.getspout.spoutapi.Spout;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
+import com.herocraftonline.dev.heroes.hero.Hero;
 import com.sgcraft.sgtitles.title.Title;
 import com.sgcraft.sgtitles.title.TitleManager;
 
@@ -38,12 +42,14 @@ public class PlayerManager {
 				return true;
 			
 			// Assign title by group!
-			String[] pGroups = SGTitles.permission.getPlayerGroups(player);
-			
-			for (String group : pGroups) {
-				for (String tName : SGTitles.config.getStringList("groups." + group)) {
-					if (tName.equalsIgnoreCase(title.getName())) {
-						return true;
+			if (SGTitles.config.getBoolean("default.use-permissions")) {
+				String[] pGroups = SGTitles.permission.getPlayerGroups(player);
+				
+				for (String group : pGroups) {
+					for (String tName : SGTitles.config.getStringList("groups." + group)) {
+						if (tName.equalsIgnoreCase(title.getName())) {
+							return true;
+						}
 					}
 				}
 			}
@@ -77,6 +83,39 @@ public class PlayerManager {
 			}
 		} catch (SQLException e) {
 			// Do exception stuff
+		}
+	}
+	
+	public static void addHeroesTitles(Player player) {
+		String format = SGTitles.config.getString("heroes.default-format");
+		String position = SGTitles.config.getString("heroes.default-position");
+		
+		if (SGTitles.hPlugin != null) {
+			Hero hero = SGTitles.hPlugin.getHeroManager().getHero(player);
+			Set<String> classNames = new HashSet<String>();
+			
+			if (SGTitles.config.getBoolean("heroes.require-master") == false || (hero.getHeroClass() != null && hero.isMaster(hero.getHeroClass()))) {
+				classNames.add(hero.getHeroClass().getName());
+			}
+			if (SGTitles.config.getBoolean("heroes.require-master") == false || (hero.getSecondClass() != null && hero.isMaster(hero.getSecondClass()))) {
+				classNames.add(hero.getSecondClass().getName());
+			}
+			
+			for (String titleName : classNames) {
+				Title title = TitleManager.get(titleName);
+				if (title == null) {
+					String data = format.replace("#class#", titleName);
+					TitleManager.addTitle(titleName.toLowerCase(), data, position);
+					title = TitleManager.get(titleName.toLowerCase());
+				}
+				
+				if (!checkTitle(player, title)) {
+					PlayerManager.giveTitle(player, titleName.toLowerCase());
+					player.sendMessage("§5[§6SGTitles§5] §fCongratulatons! You have been granted the title: " + titleName.toLowerCase());
+					if (SGTitles.config.getBoolean("heroes.broadcast"))
+						Bukkit.getServer().broadcastMessage("§5[§6SGTitles§5] §6" + player.getName() + "§3 unlocked the title §b" + titleName + "!");
+				}
+			}
 		}
 	}
 	
@@ -146,12 +185,14 @@ public class PlayerManager {
 				titles.add(TitleManager.get(rs.getString("title_name")));
 			}
 			rs.close();
-			String[] pGroups = SGTitles.permission.getPlayerGroups(player);
-			for (String group : pGroups) {
-				for (String tName : SGTitles.config.getStringList("groups." + group)) {
-					gTitle = TitleManager.get(tName);
-					if (gTitle != null && !titles.contains(gTitle))
-						titles.add(gTitle);
+			if (SGTitles.config.getBoolean("default.use-permissions")) {
+				String[] pGroups = SGTitles.permission.getPlayerGroups(player);
+				for (String group : pGroups) {
+					for (String tName : SGTitles.config.getStringList("groups." + group)) {
+						gTitle = TitleManager.get(tName);
+						if (gTitle != null && !titles.contains(gTitle))
+							titles.add(gTitle);
+					}
 				}
 			}
 		} catch (SQLException e) {

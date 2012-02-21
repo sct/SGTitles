@@ -1,4 +1,5 @@
 default:
+    use-permissions: true
     color-names-by-default: true
     default-name-color: white
 groups:
@@ -38,5 +39,6 @@ deathtp:
 heroes:
     enabled: true
     broadcast: false
+    require-master: true
     default-position: prefix
     default-format: '[#class#]'
