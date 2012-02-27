@@ -60,7 +60,7 @@ public class PlayerManager {
 			
 			// Assign title by group!
 			if (SGTitles.config.getBoolean("default.use-permissions")) {
-				String[] pGroups = SGTitles.permission.getPlayerGroups(player);
+				String[] pGroups = SGTitles.permission.getPlayerGroups((String) null,player.getName());
 				
 				for (String group : pGroups) {
 					for (String tName : SGTitles.config.getStringList("groups." + group)) {
@@ -203,7 +203,7 @@ public class PlayerManager {
 			}
 			rs.close();
 			if (SGTitles.config.getBoolean("default.use-permissions")) {
-				String[] pGroups = SGTitles.permission.getPlayerGroups(player);
+				String[] pGroups = SGTitles.permission.getPlayerGroups((String) null,player.getName());
 				for (String group : pGroups) {
 					for (String tName : SGTitles.config.getStringList("groups." + group)) {
 						gTitle = TitleManager.get(tName);
