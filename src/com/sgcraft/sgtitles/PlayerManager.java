@@ -138,15 +138,16 @@ public class PlayerManager {
 	
 	public static String formatColor(String pName) {
 		ChatColor color = getColor(pName);
+		String sColor = null;
 		if (color != null)
-			pName = color.toString() + pName;
-		return pName;
+			sColor = color.toString();
+		return sColor;
 	}
 	
 	public static String formatTitle(Player player) {
 		String oldName = player.getName();
-		String newName = formatColor(player.getName());
-		String spoutName = formatColor(player.getName());
+		String newName = SGTitles.config.getString("default.format").replace("#player#", player.getName());
+		String spoutName = formatColor(player.getName()) + player.getName();
 		String spoutFormat = SGTitles.config.getString("spout.format");
 		Boolean spout = SGTitles.spoutEnabled;
 		
@@ -155,18 +156,28 @@ public class PlayerManager {
 		if (Prefix.containsKey(oldName)) {
 			Title pTitle = Prefix.get(oldName);
 			spoutName = spoutName.replace("#prefix#", pTitle.getData());
-			newName = pTitle.getData() + newName;
+			newName = newName.replace("#prefix#", pTitle.getData());
 		} else {
 			if (spout == true)
 				spoutName = spoutName.replace("#prefix#","");
+			newName = newName.replace("#prefix#", "");
 		}
 		
 		if (Suffix.containsKey(oldName)) {
 			Title sTitle = Suffix.get(oldName);
 			spoutName = spoutName.replace("#suffix#",sTitle.getData());
-			newName = newName + sTitle.getData();
+			newName = newName.replace("#suffix#", sTitle.getData());
 		} else {
-			spoutName = spoutName.replace("#suffix#", "");
+			if (spout == true)
+				spoutName = spoutName.replace("#suffix#", "");
+			newName = newName.replace("#suffix#", "");
+		}
+		
+		String sColor = formatColor(oldName);
+		if (sColor != null) {
+			newName = newName.replace("#color#", sColor);
+		} else {
+			newName = newName.replace("#color#", "");
 		}
 		
 		if (spout == true) {
@@ -184,6 +195,15 @@ public class PlayerManager {
 		} else {
 			if (SGTitles.config.getBoolean("default.color-names-by-default")) {
 				color = ChatColor.valueOf(SGTitles.config.getString("default.default-name-color").toUpperCase());
+				if (SGTitles.config.getBoolean("default.use-permissions") && SGTitles.config.getBoolean("default.color-names-by-default")) {
+					String pGroup = SGTitles.permission.getPrimaryGroup((String) null, pName);
+					for (String cGroup : SGTitles.config.getStringList("default.color-by-group")) {
+						String[] arg = cGroup.split(":");
+						if (arg[0].equalsIgnoreCase(pGroup)) {
+							color = ChatColor.valueOf(arg[1]);
+						}
+					}
+				}
 			} else {
 				color = null;
 			}

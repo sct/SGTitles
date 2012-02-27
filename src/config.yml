@@ -1,7 +1,10 @@
 default:
     use-permissions: true
+    format: '#prefix##color##player##suffix#'
     color-names-by-default: true
     default-name-color: white
+    color-by-group:
+    - example:BLUE
 groups:
     Admin:
     - example

@@ -28,7 +28,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.command.ColouredConsoleSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
-
 import com.sgcraft.sgtitles.PlayerManager;
 import com.sgcraft.sgtitles.SGTitles;
 import com.sgcraft.sgtitles.title.Title;
@@ -95,6 +94,24 @@ public class TitleCommands implements CommandExecutor {
 		if (checkPerm(player,"admin.delete",true))
 			player.sendMessage("§f  §b/title delete §3<name>");
 	}
+	
+	private void formatTitles(CommandSender sender,List<Title> titles,Integer page) {
+		Integer currentIndex = (page * 5) - 5;
+		Integer x = 0;
+		
+		Integer totalPage = (int) Math.ceil((float) titles.size() / 5);
+		if (titles.size() == 0)
+    		sender.sendMessage("§f  §bNo titles");
+		for (x = currentIndex;x <= (currentIndex + 4);x++) {
+			try {
+				Title title = titles.get(x);
+				sender.sendMessage("§f  §bName: §3" + title.getName() + " §bType: §3" + title.getPos().toUpperCase() + " §bTitle: §f" + TitleManager.replaceColors(title.getData()));
+			} catch (IndexOutOfBoundsException e) {
+				// Skip missing rows
+			}
+		}
+		sender.sendMessage("§5[§6 Page §7(" + page + "/" + totalPage + ") §5] [§6 Total: §3" + titles.size() + " §5]");
+	} 
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -312,10 +329,29 @@ public class TitleCommands implements CommandExecutor {
         	
         	Player target;
         	Boolean self = true;
-        	int total = 0;
+        	Integer page = 1;
+        	
         	if (args.length > 1) {
         		target = Bukkit.getServer().getPlayer(args[1]);
-        		self = false;
+        		if (target != null) {
+        			self = false;
+        			if (args.length == 3) {
+        				try {
+            				page = Integer.parseInt(args[2]);
+            			} catch (NumberFormatException e) {
+            				sendErr((Player) sender,"Page must be a number.");
+            				return true;
+            			}
+        			}
+        		} else {
+        			try {
+        				page = Integer.parseInt(args[1]);
+        				target = Bukkit.getServer().getPlayer(sender.getName());
+        			} catch (NumberFormatException e) {
+        				sendErr((Player) sender,"Page must be a number.");
+        				return true;
+        			}
+        		}
         	} else {
         		target = Bukkit.getServer().getPlayer(sender.getName());
         	}
@@ -330,12 +366,7 @@ public class TitleCommands implements CommandExecutor {
         		sender.sendMessage("§5[§6 Your Titles §5]§f--------------------------");
         	else
         		sender.sendMessage("§5[§6 " + target.getName() + "'s Titles §5]§f--------------------------");
-        	for (Title title : titles) {
-        		sender.sendMessage("§f  §bName: §3" + title.getName() + " §bType: §3" + title.getPos().toUpperCase() + " §bTitle: §f" + TitleManager.replaceColors(title.getData()));
-        		total++;
-        	}
-        	if (total == 0)
-        		sender.sendMessage("§f| §bNo titles");
+        	formatTitles(sender,titles,page);
         	return true;
         }
         

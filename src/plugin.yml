@@ -1,6 +1,6 @@
 name: SGTitles
 main: com.sgcraft.sgtitles.SGTitles
-version: 0.7
+version: 0.8
 author: SGCraft
 description: Elegant Title Management
 depend: [Vault]
